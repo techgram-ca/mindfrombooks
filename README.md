@@ -123,11 +123,14 @@ A learner gets at most one of the two daily emails per day.
 1. Log in as the admin → `/admin`.
 2. **Users → Create user & grant access** → the tester gets an email to set a password.
 3. As a normal user, open a course and enter `TEST100` → enrolled free, no Stripe.
-4. The course starts **tomorrow**. To test today, edit the enrollment's `start_date` in Supabase
-   (set it to today's date in the enrollment's timezone), then submit Day 1.
-5. Create a coupon that leaves a US$1 price (e.g. US$8.99 off Fix Your Money), set a course to
-   **3 days** in the admin, buy it with a real card, respond on all 3 days (or move `start_date`
-   back and add responses), then press **Get my refund** on the Purchases page.
+4. The course starts **tomorrow**. To test without waiting, open **Admin → Users → that user** and
+   use **Jump to day** on the enrollment: pick any day (or "Starts tomorrow" / "Finished
+   yesterday") and press Apply. "Mark earlier days as answered" fills the days before it with
+   test responses, so you can see the on-track and refund-eligible states; "Delete all responses"
+   resets the course.
+5. Create a coupon that leaves a US$1 price (e.g. US$8.99 off Fix Your Money), buy the course with
+   a real card, jump that enrollment to **Finished yesterday** with earlier days marked as answered,
+   then press **Get my refund** on the Purchases page.
 
 Setting a course to fewer days hides the later tasks but keeps their content, so you can set it back.
 
