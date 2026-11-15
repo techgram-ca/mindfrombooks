@@ -293,11 +293,11 @@ insert into public.coupons (code, percent_off, max_redemptions, source_label, on
 on conflict (code) do nothing;
 
 insert into public.email_templates (key, subject, body_markdown, button_label) values
-  ('welcome', 'You''re in — {{course_name}} starts {{start_label}}', 'Hi {{name}},
+  ('welcome', 'You''re in — welcome to {{course_name}}', 'Hi {{name}},
 
 Welcome to **{{course_name}}** — {{days}} days, one small action a day.
 
-**Day 1 opens {{start_label}}.** Each day you get one task and answer one question. A day''s task closes at 11:59 pm your time, so try to do it early.
+**{{start_line}}** Each day you get one task and answer one question. A day''s task closes at 11:59 pm your time, so try to do it early.
 
 {{guarantee_line}}', 'Open my dashboard'),
   ('daily_reminder', 'Day {{day}} of {{course_name}} is ready: {{task_title}}', 'Hi {{name}},

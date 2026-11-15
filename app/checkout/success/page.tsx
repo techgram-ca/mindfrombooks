@@ -1,0 +1,27 @@
+import type { Metadata } from "next";
+import { redirect } from "next/navigation";
+import { SuccessPoller } from "@/components/dashboard/success-poller";
+import { Logo } from "@/components/shared/logo";
+import { requireUser } from "@/lib/auth";
+
+export const metadata: Metadata = { title: "You're in!", robots: { index: false } };
+
+export default async function CheckoutSuccessPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ session_id?: string }>;
+}) {
+  const { session_id: sessionId } = await searchParams;
+  if (!sessionId) redirect("/dashboard");
+  await requireUser(`/checkout/success?session_id=${encodeURIComponent(sessionId)}`);
+  return (
+    <div className="flex min-h-dvh flex-col">
+      <header className="container-page py-5">
+        <Logo />
+      </header>
+      <main className="container-narrow flex flex-1 flex-col items-center justify-center pb-24 text-center">
+        <SuccessPoller sessionId={sessionId} />
+      </main>
+    </div>
+  );
+}
