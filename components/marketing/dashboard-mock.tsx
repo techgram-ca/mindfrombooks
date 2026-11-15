@@ -4,9 +4,9 @@ export function DashboardMock() {
     <div
       className="border-border bg-background shadow-lift mx-auto w-full max-w-[20rem] rounded-[2rem] border p-4"
       role="img"
-      aria-label="Preview of the daily dashboard: today's task card with a progress bar and a respond button"
+      aria-label="Preview of the daily dashboard: today's task card with a progress bar and an act-now button"
     >
-      <p className="font-serif text-lg font-semibold">Good morning, Aman 👋</p>
+      <p className="font-serif text-lg font-semibold">Good morning, Sam 👋</p>
       <p className="text-muted-foreground mt-0.5 text-sm">🔥 11-day streak</p>
       <p className="text-muted-foreground mt-4 text-[11px] font-semibold tracking-[0.14em] uppercase">
         Today
@@ -19,7 +19,7 @@ export function DashboardMock() {
           <div className="h-full w-[39%] rounded-full bg-[#2F7D57]" />
         </div>
         <div className="bg-primary text-primary-foreground mt-3 rounded-full py-2 text-center text-sm font-medium">
-          Respond now →
+          Act now →
         </div>
       </div>
       <div className="border-border bg-surface mt-3 rounded-2xl border p-4">

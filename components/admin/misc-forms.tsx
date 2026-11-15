@@ -372,7 +372,7 @@ export function SetDayForm({
         </Label>
         <Select
           id={`${id}-r`}
-          className="h-9 w-56"
+          className="h-9 w-72"
           value={responses}
           onChange={(e) => setResponses(e.target.value)}
         >

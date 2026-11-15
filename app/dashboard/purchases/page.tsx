@@ -7,6 +7,7 @@ import { RefundStatus } from "@/components/dashboard/refund-status";
 import { EmptyState } from "@/components/shared/empty-state";
 import { requireUser } from "@/lib/auth";
 import { getLearnerState } from "@/lib/queries/learning";
+import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
 import { formatUsd } from "@/lib/pricing";
 import type { Order } from "@/lib/types";
@@ -16,7 +17,6 @@ export const metadata: Metadata = { title: "Purchases & refunds" };
 type OrderRow = Order & {
   courses: { name: string; emoji: string } | null;
   bundles: { name: string } | null;
-  coupons: { code: string } | null;
 };
 
 const statusLabel: Record<Order["status"], string> = {
@@ -33,12 +33,24 @@ export default async function PurchasesPage() {
     getLearnerState(profile),
     supabase
       .from("orders")
-      .select("*, courses(name, emoji), bundles(name), coupons(code)")
+      .select("*, courses(name, emoji), bundles(name)")
       .eq("user_id", profile.id)
       .neq("status", "pending")
       .order("created_at", { ascending: false }),
   ]);
   const orders = (ordersRes.data ?? []) as OrderRow[];
+  // Coupon rows are hidden from learners by RLS; fetch only the codes used on this person's orders.
+  const couponIds = [
+    ...new Set(orders.map((o) => o.coupon_id).filter((id): id is string => Boolean(id))),
+  ];
+  const codes = new Map<string, string>();
+  if (couponIds.length > 0) {
+    const { data: couponRows } = await createAdminClient()
+      .from("coupons")
+      .select("id, code")
+      .in("id", couponIds);
+    for (const c of couponRows ?? []) codes.set(c.id as string, c.code as string);
+  }
   const dateFmt = new Intl.DateTimeFormat("en-US", {
     dateStyle: "medium",
     timeZone: profile.timezone,
@@ -121,7 +133,7 @@ export default async function PurchasesPage() {
                   </p>
                   <p className="text-muted-foreground text-sm">
                     {dateFmt.format(new Date(o.created_at))}
-                    {o.coupons?.code && ` · code ${o.coupons.code}`}
+                    {o.coupon_id && codes.get(o.coupon_id) && ` · code ${codes.get(o.coupon_id)}`}
                   </p>
                 </div>
                 <div className="shrink-0 text-right">
