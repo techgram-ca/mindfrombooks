@@ -9,6 +9,7 @@ import {
   saveEmailTemplateAction,
   saveSettingsAction,
   saveTestimonialAction,
+  setEnrollmentDayAction,
 } from "@/app/admin/actions";
 import { useSave } from "@/components/admin/use-save";
 import { Button } from "@/components/ui/button";
@@ -318,6 +319,73 @@ export function GrantCourseForm({
       </div>
       <ErrorLine error={error} />
     </div>
+  );
+}
+
+/** Testing tool on the user page: jump an enrollment to any day. */
+export function SetDayForm({
+  enrollmentId,
+  currentDay,
+  totalDays,
+}: {
+  enrollmentId: string;
+  currentDay: number;
+  totalDays: number;
+}) {
+  const { pending, error, save } = useSave();
+  const [day, setDay] = useState(String(currentDay));
+  const [responses, setResponses] = useState("keep");
+  const id = `day-${enrollmentId}`;
+  return (
+    <form
+      className="flex flex-wrap items-end gap-2"
+      onSubmit={(e) => {
+        e.preventDefault();
+        if (
+          responses === "clear" &&
+          !window.confirm(
+            "Delete every response this person wrote in this course? This can't be undone.",
+          )
+        )
+          return;
+        save(() => setEnrollmentDayAction({ enrollmentId, day, responses }));
+      }}
+    >
+      <div>
+        <Label htmlFor={id} className="text-muted-foreground text-xs">
+          Jump to day
+        </Label>
+        <Select id={id} className="h-9 w-40" value={day} onChange={(e) => setDay(e.target.value)}>
+          <option value="0">Starts tomorrow</option>
+          {Array.from({ length: totalDays }, (_, i) => (
+            <option key={i + 1} value={i + 1}>
+              Day {i + 1}
+              {i + 1 === totalDays ? " (final day)" : ""}
+            </option>
+          ))}
+          <option value={totalDays + 1}>Finished yesterday</option>
+        </Select>
+      </div>
+      <div>
+        <Label htmlFor={`${id}-r`} className="text-muted-foreground text-xs">
+          Responses
+        </Label>
+        <Select
+          id={`${id}-r`}
+          className="h-9 w-56"
+          value={responses}
+          onChange={(e) => setResponses(e.target.value)}
+        >
+          <option value="keep">Leave as they are</option>
+          <option value="fill">Mark earlier days as answered</option>
+          <option value="clear">Delete all responses</option>
+        </Select>
+      </div>
+      <Button type="submit" size="sm" variant="outline" disabled={pending}>
+        {pending ? "Moving…" : "Apply"}
+      </Button>
+      <ErrorLine error={error} />
+    </form>
   );
 }
 

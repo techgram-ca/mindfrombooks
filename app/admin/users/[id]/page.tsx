@@ -8,11 +8,11 @@ import {
   setRoleAction,
 } from "@/app/admin/actions";
 import { ActionButton } from "@/components/admin/action-button";
-import { GrantCourseForm } from "@/components/admin/misc-forms";
+import { GrantCourseForm, SetDayForm } from "@/components/admin/misc-forms";
 import { AdminHeader, Section, TableWrap, fmtDate } from "@/components/admin/ui";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardBody } from "@/components/ui/card";
-import { todayInTz } from "@/lib/course-days";
+import { isPastFinalDay, todayInTz } from "@/lib/course-days";
 import { formatUsd } from "@/lib/pricing";
 import { getAllCourses } from "@/lib/queries/admin";
 import { getSettings } from "@/lib/queries/catalog";
@@ -208,6 +208,22 @@ export default async function AdminUserPage({ params }: { params: Promise<{ id: 
                     <div className="text-muted-foreground">Grace: {e.grace_days}</div>
                   </td>
                   <td>
+                    {(e.status === "active" || e.status === "completed") && (
+                      <div className="mb-3">
+                        <SetDayForm
+                          key={`${e.id}-${e.start_date}`}
+                          enrollmentId={e.id}
+                          currentDay={
+                            !e.start_date
+                              ? 0
+                              : isPastFinalDay(e.start_date, todayInTz(e.timezone), e.courses.days)
+                                ? e.courses.days + 1
+                                : p.currentDay
+                          }
+                          totalDays={e.courses.days}
+                        />
+                      </div>
+                    )}
                     <div className="flex flex-wrap gap-2">
                       {(e.status === "active" || e.status === "completed") && (
                         <ActionButton
