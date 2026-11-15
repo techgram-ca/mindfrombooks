@@ -12,24 +12,23 @@ import {
   type Task,
 } from "@/lib/types";
 import { demoBooks, demoBundle, demoCourses, demoPhases, demoTasks } from "./demo-catalog";
+import { SUPABASE_PUBLISHABLE_KEY, SUPABASE_URL, supabaseSecretKey } from "@/lib/supabase/env";
 
 export function isSupabaseConfigured(): boolean {
-  return Boolean(process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY);
+  return Boolean(SUPABASE_URL && SUPABASE_PUBLISHABLE_KEY);
 }
 
 function hasServiceRole(): boolean {
-  return isSupabaseConfigured() && Boolean(process.env.SUPABASE_SERVICE_ROLE_KEY);
+  return isSupabaseConfigured() && Boolean(supabaseSecretKey());
 }
 
 let anon: SupabaseClient | null = null;
 /** Cookie-less anon client: public catalog reads that can be cached / prerendered. */
 function publicClient(): SupabaseClient {
   if (!anon) {
-    anon = createPlainClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-      { auth: { persistSession: false, autoRefreshToken: false } },
-    );
+    anon = createPlainClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {
+      auth: { persistSession: false, autoRefreshToken: false },
+    });
   }
   return anon;
 }
