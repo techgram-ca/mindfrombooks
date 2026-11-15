@@ -67,11 +67,18 @@ export async function signupAction(_prev: AuthState, formData: FormData): Promis
       },
     });
     if (error) {
-      return {
-        error: /registered|exists/i.test(error.message)
-          ? "An account with this email already exists. Try logging in."
-          : error.message,
-      };
+      console.error(`[auth:signup] ${error.status ?? ""} ${error.message}`);
+      if (/registered|exists/i.test(error.message)) {
+        return { error: "An account with this email already exists. Try logging in." };
+      }
+      if (/database error/i.test(error.message)) {
+        // The profile trigger failed — usually the migrations haven't all been run.
+        return {
+          error:
+            "We couldn't create your account because the database isn't fully set up. (Admin: run every file in supabase/migrations, in order.)",
+        };
+      }
+      return { error: error.message };
     }
     // Supabase returns a user with no identities when the email is already taken.
     if (data.user && data.user.identities?.length === 0) {
