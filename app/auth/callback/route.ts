@@ -32,10 +32,15 @@ export async function GET(request: NextRequest) {
   const {
     data: { user },
   } = await supabase.auth.getUser();
+  let destination = next;
   if (user) {
     // First sign-in within the last 10 minutes = a new account (e.g. Google).
     const isNew = Date.now() - new Date(user.created_at).getTime() < 10 * 60_000;
-    if (isNew) await applySignupAttribution(user.id);
+    if (isNew) {
+      await applySignupAttribution(user.id);
+      const provider = user.app_metadata.provider === "google" ? "google" : "email";
+      destination = `${next}${next.includes("?") ? "&" : "?"}welcome=${provider}`;
+    }
   }
-  return NextResponse.redirect(`${origin}${next}`);
+  return NextResponse.redirect(`${origin}${destination}`);
 }

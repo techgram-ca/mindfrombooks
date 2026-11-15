@@ -51,7 +51,7 @@ export async function signupAction(_prev: AuthState, formData: FormData): Promis
   }
   if (data.user) await applySignupAttribution(data.user.id);
   if (data.session) {
-    redirect(`${next}${next.includes("?") ? "&" : "?"}welcome=1`);
+    redirect(`${next}${next.includes("?") ? "&" : "?"}welcome=email`);
   }
   return {
     signedUp: true,

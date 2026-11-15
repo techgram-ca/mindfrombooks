@@ -1,7 +1,8 @@
 import type { Metadata, Viewport } from "next";
-import type { ReactNode } from "react";
+import { Suspense, type ReactNode } from "react";
 import { Fraunces, Inter } from "next/font/google";
 import { Analytics } from "@vercel/analytics/next";
+import { WelcomeTracker } from "@/components/shared/welcome-tracker";
 import { Toaster } from "@/components/ui/toaster";
 import { BRAND, TAGLINE, siteUrl } from "@/lib/utils";
 import "./globals.css";
@@ -35,6 +36,9 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         {children}
         <Toaster />
         <Analytics />
+        <Suspense fallback={null}>
+          <WelcomeTracker />
+        </Suspense>
       </body>
     </html>
   );

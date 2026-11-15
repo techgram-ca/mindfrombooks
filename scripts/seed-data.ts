@@ -131,7 +131,7 @@ export const COURSES: SeedCourse[] = [
     name: "Build Discipline",
     category: "Habits",
     emoji: "🔥",
-    accent_color: "#C2542D",
+    accent_color: "#B04A26",
     short_description:
       "66 days to make one habit automatic — and prove you can keep a promise to yourself.",
     description:
@@ -286,7 +286,7 @@ export const COURSES: SeedCourse[] = [
     name: "Get Fit, Stay Healthy",
     category: "Health",
     emoji: "🏃",
-    accent_color: "#1F8A8A",
+    accent_color: "#177272",
     short_description:
       "42 days of walking, sleep, mobility and bodyweight basics. No gym, no extremes.",
     description:
@@ -446,7 +446,7 @@ export const COURSES: SeedCourse[] = [
     name: "Talk with Confidence",
     category: "Communication",
     emoji: "🗣️",
-    accent_color: "#B7791F",
+    accent_color: "#8F5A0E",
     short_description:
       "33 people-skills, one a day. Be liked, be heard and hold your ground kindly.",
     description:

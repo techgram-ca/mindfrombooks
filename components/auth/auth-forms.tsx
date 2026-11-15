@@ -11,7 +11,6 @@ import {
 import { Input, Label, Select, FieldHint } from "@/components/ui/input";
 import { SubmitButton } from "@/components/shared/submit-button";
 import { GoogleButton } from "@/components/auth/google-button";
-import { track } from "@/lib/track";
 
 const initial: AuthState = {};
 
@@ -116,10 +115,6 @@ export function SignupForm({ next }: { next: string }) {
   const [state, action] = useActionState(signupAction, initial);
   const { detected, all } = useTimezones();
   const [timezone, setTimezone] = useState<string | null>(null);
-
-  useEffect(() => {
-    if (state.signedUp) track("signup_completed", { method: "email" });
-  }, [state.signedUp]);
 
   if (state.signedUp) {
     return (
