@@ -61,11 +61,34 @@ export async function GET() {
     secret_key_reads_profiles: await probe(supabaseSecretKey(), "profiles"),
     secret_key_reads_tasks: await probe(supabaseSecretKey(), "tasks"),
   };
+  // Each migration file leaves a fingerprint; a missing function means that file wasn't run.
+  const functions: Record<string, string> = {};
+  if (SUPABASE_URL && supabaseSecretKey()) {
+    const db = createClient(SUPABASE_URL, supabaseSecretKey(), { auth: { persistSession: false } });
+    const calls: [string, Record<string, string> | undefined, string][] = [
+      [
+        "enrollment_progress",
+        { p_enrollment_id: "00000000-0000-0000-0000-000000000000" },
+        "…000002_functions.sql",
+      ],
+      ["admin_course_stats", undefined, "…000005_admin_stats.sql"],
+      ["admin_overview", undefined, "…000005_admin_stats.sql"],
+    ];
+    for (const [name, args, file] of calls) {
+      const { error } = await db.rpc(name, args);
+      functions[name] = error ? `error: ${error.message}` : "ok";
+      if (error)
+        problems.push(
+          `Database function ${name} failed (${error.message}) — run migration ${file}`,
+        );
+    }
+  }
+
   for (const [check, result] of Object.entries(database)) {
     if (result.startsWith("error")) problems.push(`${check}: ${result}`);
   }
   if (database.secret_key_reads_tasks === "ok (0 rows)")
     problems.push("No tasks found — run the seed.");
 
-  return NextResponse.json({ ok: problems.length === 0, problems, env, database });
+  return NextResponse.json({ ok: problems.length === 0, problems, env, database, functions });
 }
