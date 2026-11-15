@@ -1,0 +1,112 @@
+import Link from "next/link";
+import { ArrowRight, Check, Clock } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { ProgressBar } from "@/components/dashboard/progress-bar";
+import { StartCourseButton } from "@/components/dashboard/start-course-button";
+import { formatDateLong } from "@/lib/course-days";
+import { phaseNameFor, type EnrollmentView } from "@/lib/queries/learning";
+
+export function TodayCard({
+  view,
+  taskTitle,
+  hoursLeft,
+}: {
+  view: EnrollmentView;
+  taskTitle?: string;
+  hoursLeft?: number;
+}) {
+  const { course, progress, openDay } = view;
+  const base = `/dashboard/courses/${course.slug}`;
+  const pct = (progress.respondedCount / course.days) * 100;
+  const phaseName = openDay ? phaseNameFor(view.phases, openDay) : null;
+
+  return (
+    <article className="rounded-card border-border bg-surface shadow-soft relative overflow-hidden border p-5">
+      <span
+        aria-hidden
+        className="absolute inset-y-0 left-0 w-1.5"
+        style={{ background: course.accent_color }}
+      />
+      <div className="flex items-start justify-between gap-3">
+        <Link href={base} className="font-semibold hover:underline">
+          <span aria-hidden>{course.emoji} </span>
+          {course.name}
+          {openDay && (
+            <span className="text-muted-foreground font-normal">
+              {" "}
+              · Day {openDay}/{course.days}
+            </span>
+          )}
+        </Link>
+        {view.todayDone && (
+          <span
+            className="bg-success flex size-6 shrink-0 items-center justify-center rounded-full text-white"
+            aria-label="Done today"
+          >
+            <Check className="size-3.5" aria-hidden />
+          </span>
+        )}
+      </div>
+
+      {view.phase === "not_started" && (
+        <>
+          <p className="text-muted-foreground mt-2 text-[15px]">
+            {course.days} days · not started yet. Day 1 opens the morning after you start.
+          </p>
+          <div className="mt-4">
+            <StartCourseButton enrollmentId={view.enrollment.id} />
+          </div>
+        </>
+      )}
+
+      {view.phase === "starts_tomorrow" && view.enrollment.start_date && (
+        <p className="text-muted-foreground mt-2 flex items-start gap-2 text-[15px]">
+          <Clock className="mt-0.5 size-4 shrink-0" aria-hidden />
+          Day 1 opens at midnight — {formatDateLong(view.enrollment.start_date)}. See you then.
+        </p>
+      )}
+
+      {view.phase === "in_progress" && (
+        <>
+          {phaseName && <p className="text-muted-foreground mt-0.5 text-sm">Phase: {phaseName}</p>}
+          {view.todayDone ? (
+            <p className="text-muted-foreground mt-2 text-[15px]">
+              Done today —{" "}
+              {openDay === course.days ? "that was the final day 🎉" : "see you tomorrow."}
+            </p>
+          ) : (
+            taskTitle && <p className="mt-2 font-serif text-lg">“{taskTitle}”</p>
+          )}
+          <div className="mt-3">
+            <ProgressBar
+              value={pct}
+              color={course.accent_color}
+              label={`${course.name} progress`}
+            />
+          </div>
+          {!view.todayDone ? (
+            <div className="mt-4 flex flex-wrap items-center gap-3">
+              <Button asChild>
+                <Link href={`${base}/day/${openDay}`}>
+                  Respond now <ArrowRight aria-hidden />
+                </Link>
+              </Button>
+              {hoursLeft !== undefined && hoursLeft <= 3 && (
+                <span className="text-danger text-sm font-medium">
+                  Closes in {hoursLeft < 1 ? "under an hour" : `about ${Math.ceil(hoursLeft)} h`}
+                </span>
+              )}
+            </div>
+          ) : (
+            <Link
+              href={`${base}/day/${openDay}`}
+              className="text-accent-strong mt-3 inline-block text-sm font-medium underline-offset-4 hover:underline"
+            >
+              View or edit today&apos;s response
+            </Link>
+          )}
+        </>
+      )}
+    </article>
+  );
+}
