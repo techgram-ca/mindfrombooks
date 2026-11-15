@@ -5,6 +5,9 @@ import { TimezoneSync } from "@/components/dashboard/timezone-sync";
 import { Logo } from "@/components/shared/logo";
 import { requireUser } from "@/lib/auth";
 
+// Always rendered per request for the signed-in person — never cached or prerendered.
+export const dynamic = "force-dynamic";
+
 export const metadata: Metadata = {
   title: { default: "Today", template: "%s · mindfrombooks" },
   robots: { index: false },
