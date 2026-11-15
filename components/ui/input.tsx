@@ -21,10 +21,13 @@ export function Select({ className, ...props }: React.SelectHTMLAttributes<HTMLS
 
 export function Label({ className, ...props }: React.LabelHTMLAttributes<HTMLLabelElement>) {
   return (
-    <label className={cn("mb-1.5 block text-sm font-medium text-foreground", className)} {...props} />
+    <label
+      className={cn("text-foreground mb-1.5 block text-sm font-medium", className)}
+      {...props}
+    />
   );
 }
 
 export function FieldHint({ className, ...props }: React.HTMLAttributes<HTMLParagraphElement>) {
-  return <p className={cn("mt-1.5 text-sm text-muted-foreground", className)} {...props} />;
+  return <p className={cn("text-muted-foreground mt-1.5 text-sm", className)} {...props} />;
 }

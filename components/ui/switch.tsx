@@ -7,7 +7,7 @@ export function Switch({ className, ...props }: React.ComponentProps<typeof Swit
   return (
     <SwitchPrimitive.Root
       className={cn(
-        "inline-flex h-7 w-12 shrink-0 items-center rounded-full bg-border transition-colors data-[state=checked]:bg-success",
+        "bg-border data-[state=checked]:bg-success inline-flex h-7 w-12 shrink-0 items-center rounded-full transition-colors",
         className,
       )}
       {...props}

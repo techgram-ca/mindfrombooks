@@ -21,7 +21,7 @@ export function EmptyState({
           </div>
         )}
         <h2 className="text-xl font-semibold">{title}</h2>
-        {children && <div className="mt-2 max-w-sm text-muted-foreground">{children}</div>}
+        {children && <div className="text-muted-foreground mt-2 max-w-sm">{children}</div>}
         {action && <div className="mt-5">{action}</div>}
       </CardBody>
     </Card>

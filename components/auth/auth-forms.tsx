@@ -18,14 +18,14 @@ const initial: AuthState = {};
 function Notice({ state }: { state: AuthState }) {
   if (state.error) {
     return (
-      <p role="alert" className="rounded-xl bg-danger-soft px-3.5 py-2.5 text-sm text-danger">
+      <p role="alert" className="bg-danger-soft text-danger rounded-xl px-3.5 py-2.5 text-sm">
         {state.error}
       </p>
     );
   }
   if (state.message) {
     return (
-      <p role="status" className="rounded-xl bg-success-soft px-3.5 py-2.5 text-sm text-success">
+      <p role="status" className="bg-success-soft text-success rounded-xl px-3.5 py-2.5 text-sm">
         {state.message}
       </p>
     );
@@ -35,10 +35,10 @@ function Notice({ state }: { state: AuthState }) {
 
 function Divider() {
   return (
-    <div className="flex items-center gap-3 text-xs tracking-wide text-muted-foreground uppercase">
-      <span className="h-px flex-1 bg-border" />
+    <div className="text-muted-foreground flex items-center gap-3 text-xs tracking-wide uppercase">
+      <span className="bg-border h-px flex-1" />
       or
-      <span className="h-px flex-1 bg-border" />
+      <span className="bg-border h-px flex-1" />
     </div>
   );
 }
@@ -48,7 +48,11 @@ export function LoginForm({ next, linkError }: { next: string; linkError?: boole
   return (
     <div className="space-y-5">
       {linkError && !state.error && (
-        <Notice state={{ error: "That link has expired or was already used. Please log in or request a new one." }} />
+        <Notice
+          state={{
+            error: "That link has expired or was already used. Please log in or request a new one.",
+          }}
+        />
       )}
       <GoogleButton next={next} label="Continue with Google" />
       <Divider />
@@ -61,11 +65,20 @@ export function LoginForm({ next, linkError }: { next: string; linkError?: boole
         <div>
           <div className="flex items-baseline justify-between">
             <Label htmlFor="password">Password</Label>
-            <Link href="/forgot-password" className="text-sm text-accent-strong underline-offset-4 hover:underline">
+            <Link
+              href="/forgot-password"
+              className="text-accent-strong text-sm underline-offset-4 hover:underline"
+            >
               Forgot?
             </Link>
           </div>
-          <Input id="password" name="password" type="password" autoComplete="current-password" required />
+          <Input
+            id="password"
+            name="password"
+            type="password"
+            autoComplete="current-password"
+            required
+          />
         </div>
         <Notice state={state} />
         <SubmitButton className="w-full" pendingText="Logging in…">
@@ -82,7 +95,13 @@ export function useTimezones(): { detected: string; all: string[] } {
     try {
       return Intl.supportedValuesOf("timeZone");
     } catch {
-      return ["America/Toronto", "America/Vancouver", "America/New_York", "Europe/London", "Asia/Kolkata"];
+      return [
+        "America/Toronto",
+        "America/Vancouver",
+        "America/New_York",
+        "Europe/London",
+        "Asia/Kolkata",
+      ];
     }
   }, []);
   useEffect(() => {
@@ -130,7 +149,14 @@ export function SignupForm({ next }: { next: string }) {
         </div>
         <div>
           <Label htmlFor="password">Password</Label>
-          <Input id="password" name="password" type="password" autoComplete="new-password" required minLength={8} />
+          <Input
+            id="password"
+            name="password"
+            type="password"
+            autoComplete="new-password"
+            required
+            minLength={8}
+          />
           <FieldHint>At least 8 characters.</FieldHint>
         </div>
         <div>
@@ -147,13 +173,15 @@ export function SignupForm({ next }: { next: string }) {
               </option>
             ))}
           </Select>
-          <FieldHint>Each day&apos;s task opens at midnight and closes at 11:59 pm in this timezone.</FieldHint>
+          <FieldHint>
+            Each day&apos;s task opens at midnight and closes at 11:59 pm in this timezone.
+          </FieldHint>
         </div>
         <Notice state={state} />
         <SubmitButton className="w-full" pendingText="Creating your account…">
           Create account
         </SubmitButton>
-        <p className="text-center text-xs text-muted-foreground">
+        <p className="text-muted-foreground text-center text-xs">
           By signing up you agree to our{" "}
           <Link href="/terms" className="underline">
             Terms
@@ -191,7 +219,14 @@ export function ResetPasswordForm() {
     <form action={action} className="space-y-4">
       <div>
         <Label htmlFor="password">New password</Label>
-        <Input id="password" name="password" type="password" autoComplete="new-password" required minLength={8} />
+        <Input
+          id="password"
+          name="password"
+          type="password"
+          autoComplete="new-password"
+          required
+          minLength={8}
+        />
         <FieldHint>At least 8 characters.</FieldHint>
       </div>
       <Notice state={state} />

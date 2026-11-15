@@ -28,7 +28,8 @@ export function handle<A extends unknown[]>(fn: (...args: A) => Promise<Response
       return await fn(...args);
     } catch (err) {
       if (err instanceof HttpError) return jsonError(err.status, err.message);
-      if (err instanceof ZodError) return jsonError(400, err.issues[0]?.message ?? "Invalid request.");
+      if (err instanceof ZodError)
+        return jsonError(400, err.issues[0]?.message ?? "Invalid request.");
       console.error("[api] unhandled error", err);
       return jsonError(500, "Something went wrong on our side. Please try again.");
     }

@@ -162,7 +162,9 @@ export function formatDateLong(date: DateStr): string {
 }
 
 export function formatDateShort(date: DateStr): string {
-  return new Intl.DateTimeFormat("en-US", { timeZone: "UTC", month: "short", day: "numeric" }).format(
-    new Date(toUtcMs(date)),
-  );
+  return new Intl.DateTimeFormat("en-US", {
+    timeZone: "UTC",
+    month: "short",
+    day: "numeric",
+  }).format(new Date(toUtcMs(date)));
 }

@@ -8,7 +8,7 @@ export function ErrorView({ reset, title }: { reset: () => void; title?: string 
         📖
       </div>
       <h1 className="text-2xl font-semibold">{title ?? "This page lost its place"}</h1>
-      <p className="mt-2 text-muted-foreground">
+      <p className="text-muted-foreground mt-2">
         Something went wrong on our side. Your progress is safe — please try again.
       </p>
       <Button className="mt-6" onClick={reset}>

@@ -15,11 +15,14 @@ export default async function LoginPage({
   return (
     <>
       <h1 className="text-2xl font-semibold">Welcome back</h1>
-      <p className="mt-1 mb-6 text-muted-foreground">Today&apos;s task is waiting.</p>
+      <p className="text-muted-foreground mt-1 mb-6">Today&apos;s task is waiting.</p>
       <LoginForm next={next} linkError={sp.error === "link"} />
-      <p className="mt-6 text-center text-sm text-muted-foreground">
+      <p className="text-muted-foreground mt-6 text-center text-sm">
         New here?{" "}
-        <Link href={`/signup?next=${encodeURIComponent(next)}`} className="font-medium text-accent-strong underline-offset-4 hover:underline">
+        <Link
+          href={`/signup?next=${encodeURIComponent(next)}`}
+          className="text-accent-strong font-medium underline-offset-4 hover:underline"
+        >
           Create an account
         </Link>
       </p>

@@ -20,7 +20,8 @@ export async function loginAction(_prev: AuthState, formData: FormData): Promise
   if (!parsed.success) return { error: firstIssue(parsed.error) };
   const supabase = await createClient();
   const { error } = await supabase.auth.signInWithPassword(parsed.data);
-  if (error) return { error: "That email and password don't match. Try again or reset your password." };
+  if (error)
+    return { error: "That email and password don't match. Try again or reset your password." };
   redirect(safeNextPath(formData.get("next") as string | null));
 }
 
@@ -54,11 +55,15 @@ export async function signupAction(_prev: AuthState, formData: FormData): Promis
   }
   return {
     signedUp: true,
-    message: "Almost there — we sent a confirmation link to your email. Open it to finish signing up.",
+    message:
+      "Almost there — we sent a confirmation link to your email. Open it to finish signing up.",
   };
 }
 
-export async function forgotPasswordAction(_prev: AuthState, formData: FormData): Promise<AuthState> {
+export async function forgotPasswordAction(
+  _prev: AuthState,
+  formData: FormData,
+): Promise<AuthState> {
   const parsed = emailSchema.safeParse(formData.get("email"));
   if (!parsed.success) return { error: firstIssue(parsed.error) };
   const supabase = await createClient();
@@ -69,7 +74,10 @@ export async function forgotPasswordAction(_prev: AuthState, formData: FormData)
   return { message: "If that email has an account, a reset link is on its way." };
 }
 
-export async function resetPasswordAction(_prev: AuthState, formData: FormData): Promise<AuthState> {
+export async function resetPasswordAction(
+  _prev: AuthState,
+  formData: FormData,
+): Promise<AuthState> {
   const parsed = passwordSchema.safeParse(formData.get("password"));
   if (!parsed.success) return { error: firstIssue(parsed.error) };
   const supabase = await createClient();

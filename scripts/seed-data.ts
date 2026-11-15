@@ -132,7 +132,8 @@ export const COURSES: SeedCourse[] = [
     category: "Habits",
     emoji: "🔥",
     accent_color: "#C2542D",
-    short_description: "66 days to make one habit automatic — and prove you can keep a promise to yourself.",
+    short_description:
+      "66 days to make one habit automatic — and prove you can keep a promise to yourself.",
     description:
       "Discipline isn't a personality trait. It's what's left after you make the right thing easy and repeat it until it stops needing effort. Over 66 days you'll pick one keystone habit, shrink it until it's impossible to skip, and build the evidence — one day at a time — that you are someone who shows up.",
     number_reason:
@@ -210,7 +211,8 @@ export const COURSES: SeedCourse[] = [
     category: "AI",
     emoji: "🤖",
     accent_color: "#2F5FB3",
-    short_description: "21 practical AI skills in 21 days — for work, for learning and for making things.",
+    short_description:
+      "21 practical AI skills in 21 days — for work, for learning and for making things.",
     description:
       "You don't need to understand how AI works to get real value from it. You need practice. Each day you'll try one concrete use — on your own work, your own questions, your own projects — and write down what happened. Three weeks later you'll know what AI is good at, where it fails, and how to use it without handing over your judgment.",
     number_reason: "3 weeks, 21 skills — Work → Learning → Creating",
@@ -248,7 +250,8 @@ export const COURSES: SeedCourse[] = [
           "Give it context: who it's for, what you want, what good looks like.",
           "Use, edit or throw away the result — your call.",
         ],
-        response_prompt: "What task did you bring to AI, and was the result better or worse than you expected?",
+        response_prompt:
+          "What task did you bring to AI, and was the result better or worse than you expected?",
       },
       {
         title: "Give it a role",
@@ -261,7 +264,8 @@ export const COURSES: SeedCourse[] = [
           "Ask again, starting with: 'You are a [specific expert]. I am a [who you are]. Help me…'",
           "Compare the two answers.",
         ],
-        response_prompt: "What role did you give the AI, and how did the second answer differ from the first?",
+        response_prompt:
+          "What role did you give the AI, and how did the second answer differ from the first?",
       },
       {
         title: "Catch it being wrong",
@@ -283,7 +287,8 @@ export const COURSES: SeedCourse[] = [
     category: "Health",
     emoji: "🏃",
     accent_color: "#1F8A8A",
-    short_description: "42 days of walking, sleep, mobility and bodyweight basics. No gym, no extremes.",
+    short_description:
+      "42 days of walking, sleep, mobility and bodyweight basics. No gym, no extremes.",
     description:
       "Health isn't built in a brutal month — it's built from boring basics done most days. For six weeks you'll do one small thing daily: move a little, sleep a little better, get a little stronger. Nothing here needs equipment or a gym. It's the foundation that everything else sits on.",
     number_reason: "6 weeks to feel the change",
@@ -329,7 +334,8 @@ export const COURSES: SeedCourse[] = [
           "Leave your headphones off for the first two minutes and just notice how you feel.",
           "Pick the time you'll walk tomorrow.",
         ],
-        response_prompt: "When did you walk, how did you feel afterwards, and what time will you walk tomorrow?",
+        response_prompt:
+          "When did you walk, how did you feel afterwards, and what time will you walk tomorrow?",
       },
       {
         title: "Set a fixed wake-up time",
@@ -342,7 +348,8 @@ export const COURSES: SeedCourse[] = [
           "Count back 8 hours: that is your target time to be in bed.",
           "Take today's 10-minute walk.",
         ],
-        response_prompt: "What wake-up time did you choose, and what will you change tonight to make it easier?",
+        response_prompt:
+          "What wake-up time did you choose, and what will you change tonight to make it easier?",
       },
       {
         title: "Attach your walk to something you already do",
@@ -355,7 +362,8 @@ export const COURSES: SeedCourse[] = [
           "Put your shoes where you will see them at that time.",
           "Do today's walk at that moment.",
         ],
-        response_prompt: "What is your anchor, and did the walk feel easier when it had a fixed place in your day?",
+        response_prompt:
+          "What is your anchor, and did the walk feel easier when it had a fixed place in your day?",
       },
     ],
   },
@@ -365,7 +373,8 @@ export const COURSES: SeedCourse[] = [
     category: "Productivity",
     emoji: "⏳",
     accent_color: "#7A4FB5",
-    short_description: "24 days to see your time clearly, take control of it and protect your focus.",
+    short_description:
+      "24 days to see your time clearly, take control of it and protect your focus.",
     description:
       "Procrastination isn't laziness — it's avoiding a feeling. This course gives you one small action a day to face the thing you're avoiding, choose what actually matters and build blocks of real focus. Twenty-four days, one for every hour you have.",
     number_reason: "One day for every hour you have",
@@ -427,7 +436,8 @@ export const COURSES: SeedCourse[] = [
           "Choose one item that is important but NOT urgent.",
           "Give it 20 minutes today, before the urgent things.",
         ],
-        response_prompt: "Which important-but-not-urgent thing did you give 20 minutes to, and what got in the way?",
+        response_prompt:
+          "Which important-but-not-urgent thing did you give 20 minutes to, and what got in the way?",
       },
     ],
   },
@@ -437,7 +447,8 @@ export const COURSES: SeedCourse[] = [
     category: "Communication",
     emoji: "🗣️",
     accent_color: "#B7791F",
-    short_description: "33 people-skills, one a day. Be liked, be heard and hold your ground kindly.",
+    short_description:
+      "33 people-skills, one a day. Be liked, be heard and hold your ground kindly.",
     description:
       "Good communicators aren't born charming — they practise a small set of principles until they're natural. Each day you'll try one in a real conversation: at work, at home, with a stranger. Thirty-three days later, talking to people feels less like a risk and more like a skill.",
     number_reason: "33 principles, one a day (30 from How to Win Friends + 3 negotiation tactics)",
@@ -478,7 +489,8 @@ export const COURSES: SeedCourse[] = [
           "When you catch the urge, pause and ask: 'Why might they have done that?'",
           "Keep a tally of how many times you caught yourself.",
         ],
-        response_prompt: "How many times did you catch yourself, and what was the hardest moment to stay quiet?",
+        response_prompt:
+          "How many times did you catch yourself, and what was the hardest moment to stay quiet?",
       },
       {
         title: "Give one honest, specific compliment",
@@ -490,7 +502,8 @@ export const COURSES: SeedCourse[] = [
           "Find something they genuinely did well. Be specific.",
           "Tell them, without asking for anything afterwards.",
         ],
-        response_prompt: "Who did you appreciate, what exactly did you say, and how did they react?",
+        response_prompt:
+          "Who did you appreciate, what exactly did you say, and how did they react?",
       },
       {
         title: "Ask, then listen for two minutes",

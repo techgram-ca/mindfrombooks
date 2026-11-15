@@ -115,8 +115,16 @@ function buildSeed(): TableSeed[] {
       rows: [{ id: bundleId, ...BUNDLE, status: "published" }],
     },
     { table: "bundle_courses", conflict: "bundle_id,course_id", rows: bundleCourses },
-    { table: "coupons", conflict: "code", rows: [{ ...TEST_COUPON, one_per_user: true, active: true }] },
-    { table: "email_templates", conflict: "key", rows: Object.values(DEFAULT_TEMPLATES).map((t) => ({ ...t })) },
+    {
+      table: "coupons",
+      conflict: "code",
+      rows: [{ ...TEST_COUPON, one_per_user: true, active: true }],
+    },
+    {
+      table: "email_templates",
+      conflict: "key",
+      rows: Object.values(DEFAULT_TEMPLATES).map((t) => ({ ...t })),
+    },
   ];
 }
 
@@ -154,7 +162,9 @@ async function run(seeds: TableSeed[]) {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
   if (!url || !key) {
-    throw new Error("Set NEXT_PUBLIC_SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY in .env.local first.");
+    throw new Error(
+      "Set NEXT_PUBLIC_SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY in .env.local first.",
+    );
   }
   const supabase = createClient(url, key, { auth: { persistSession: false } });
 

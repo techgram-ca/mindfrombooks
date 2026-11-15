@@ -4,7 +4,11 @@ import { Loader2 } from "lucide-react";
 import { Button, type ButtonProps } from "@/components/ui/button";
 
 /** Submit button that shows a spinner while its <form action> is pending. */
-export function SubmitButton({ children, pendingText, ...props }: ButtonProps & { pendingText?: string }) {
+export function SubmitButton({
+  children,
+  pendingText,
+  ...props
+}: ButtonProps & { pendingText?: string }) {
   const { pending } = useFormStatus();
   return (
     <Button type="submit" disabled={pending || props.disabled} aria-busy={pending} {...props}>

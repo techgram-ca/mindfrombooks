@@ -14,11 +14,16 @@ export default async function SignupPage({
   return (
     <>
       <h1 className="text-2xl font-semibold">Create your account</h1>
-      <p className="mt-1 mb-6 text-muted-foreground">One small action a day. That&apos;s the whole plan.</p>
+      <p className="text-muted-foreground mt-1 mb-6">
+        One small action a day. That&apos;s the whole plan.
+      </p>
       <SignupForm next={next} />
-      <p className="mt-6 text-center text-sm text-muted-foreground">
+      <p className="text-muted-foreground mt-6 text-center text-sm">
         Already have an account?{" "}
-        <Link href={`/login?next=${encodeURIComponent(next)}`} className="font-medium text-accent-strong underline-offset-4 hover:underline">
+        <Link
+          href={`/login?next=${encodeURIComponent(next)}`}
+          className="text-accent-strong font-medium underline-offset-4 hover:underline"
+        >
           Log in
         </Link>
       </p>
