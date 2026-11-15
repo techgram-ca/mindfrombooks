@@ -1,6 +1,7 @@
 import "server-only";
 import { createAdminClient } from "@/lib/supabase/admin";
 import type { Certificate } from "@/lib/types";
+import { supabaseSecretKey } from "@/lib/supabase/env";
 
 export interface CertificateView {
   certificate: Certificate;
@@ -14,7 +15,7 @@ export interface CertificateView {
 
 /** Certificates are public by their unguessable id; nothing else about the learner is exposed. */
 export async function getCertificate(id: string): Promise<CertificateView | null> {
-  if (!/^[a-z0-9]{6,20}$/.test(id) || !process.env.SUPABASE_SERVICE_ROLE_KEY) return null;
+  if (!/^[a-z0-9]{6,20}$/.test(id) || !supabaseSecretKey()) return null;
   const { data } = await createAdminClient()
     .from("certificates")
     .select("*, enrollments!inner(courses!inner(name, slug, emoji, accent_color, days))")

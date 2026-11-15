@@ -49,7 +49,7 @@ from the seed data so you can look at it. Sign-in, checkout and the dashboard ne
 
 1. Create a project at supabase.com.
 2. **SQL Editor** → run each file in `supabase/migrations/` in order (or `supabase db push` with the CLI).
-3. **Project Settings → API**: copy the URL, the `anon` key and the `service_role` key into `.env.local`.
+3. **Project Settings → API**: copy the project URL into `NEXT_PUBLIC_SUPABASE_URL`, the **publishable key** (`sb_publishable_…`) into `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` and the **secret key** (`sb_secret_…`) into `SUPABASE_SECRET_KEY`. (Older projects: the legacy `anon` and `service_role` keys work in the same two variables.)
 4. **Authentication → URL Configuration**: set _Site URL_ to your domain and add
    `https://YOUR-DOMAIN/auth/callback` (and `http://localhost:3000/auth/callback`) to _Redirect URLs_.
 5. **Authentication → Providers → Google**: enable it and paste a Google OAuth client ID and secret
@@ -193,7 +193,7 @@ tests/              Vitest unit tests
   Image upload and task export are route handlers under `app/api/admin/`.
 - **Security**: RLS is on for every table. Learners can read only their own rows and can update
   only their name, timezone and reminder settings. Enrollments, responses, orders and refunds are
-  written only by server code with the service-role key (`lib/supabase/admin.ts`, server-only).
+  written only by server code with the secret key (`lib/supabase/admin.ts`, server-only).
   Full task content is never readable with the public key — only sample days are.
 - **Rate limits** on coupon checks, checkout, responses and refunds are in memory per server
   instance (`lib/rate-limit.ts`). Swap in Redis/Upstash if you need a strict global limit.
