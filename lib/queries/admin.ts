@@ -1,4 +1,5 @@
 import "server-only";
+import { cache } from "react";
 import { createAdminClient } from "@/lib/supabase/admin";
 import type { Course } from "@/lib/types";
 
@@ -17,9 +18,23 @@ export async function getAllCourses(): Promise<Course[]> {
   return (data ?? []) as Course[];
 }
 
+/**
+ * Per-request list of reporting problems. Report queries fail soft: the page
+ * still loads (with empty numbers) and shows the admin what went wrong.
+ */
+export const reportProblems = cache((): string[] => []);
+
+export function noteReportProblem(what: string, message: string): void {
+  console.error(`[admin report] ${what}: ${message}`);
+  reportProblems().push(`${what}: ${message}`);
+}
+
 export async function getCourseStats(): Promise<Map<string, CourseStats>> {
   const { data, error } = await createAdminClient().rpc("admin_course_stats");
-  if (error) throw new Error(error.message);
+  if (error) {
+    noteReportProblem("admin_course_stats", error.message);
+    return new Map();
+  }
   return new Map(((data ?? []) as CourseStats[]).map((s) => [s.course_id, s]));
 }
 

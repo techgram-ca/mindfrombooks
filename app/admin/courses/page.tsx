@@ -1,11 +1,11 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { Plus } from "lucide-react";
-import { AdminHeader, TableWrap, pct } from "@/components/admin/ui";
+import { AdminHeader, ReportProblems, TableWrap, pct } from "@/components/admin/ui";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { formatUsd } from "@/lib/pricing";
-import { getAllCourses, getCourseStats } from "@/lib/queries/admin";
+import { getAllCourses, getCourseStats, reportProblems } from "@/lib/queries/admin";
 import { requireAdmin } from "@/lib/auth";
 
 export const metadata: Metadata = { title: "Courses" };
@@ -27,6 +27,7 @@ export default async function AdminCoursesPage() {
           </Button>
         }
       />
+      <ReportProblems problems={reportProblems()} />
       <TableWrap>
         <thead>
           <tr>
