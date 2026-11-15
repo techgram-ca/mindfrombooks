@@ -41,6 +41,7 @@ export function TodayCard({
         {view.todayDone && (
           <span
             className="bg-success flex size-6 shrink-0 items-center justify-center rounded-full text-white"
+            role="img"
             aria-label="Done today"
           >
             <Check className="size-3.5" aria-hidden />

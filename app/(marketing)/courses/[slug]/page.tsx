@@ -139,7 +139,12 @@ export default async function CoursePage({ params }: { params: Params }) {
               <h2 id="books-title" className="text-2xl font-semibold">
                 Inspired by
               </h2>
-              <div className="-mx-5 mt-4 flex gap-3 overflow-x-auto px-5 pb-2">
+              <div
+                className="-mx-5 mt-4 flex gap-3 overflow-x-auto px-5 pb-2"
+                tabIndex={0}
+                role="group"
+                aria-label="Books this course is inspired by"
+              >
                 {books.map((b) => (
                   <BookCard key={b.id} book={b} color={course.accent_color} />
                 ))}
