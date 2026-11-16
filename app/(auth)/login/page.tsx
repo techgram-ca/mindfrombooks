@@ -9,7 +9,7 @@ export const metadata: Metadata = { title: "Log in", robots: { index: false } };
 export default async function LoginPage({
   searchParams,
 }: {
-  searchParams: Promise<{ next?: string; error?: string }>;
+  searchParams: Promise<{ next?: string; error?: string; email?: string }>;
 }) {
   const sp = await searchParams;
   const next = safeNextPath(sp.next);
@@ -18,7 +18,12 @@ export default async function LoginPage({
     <>
       <h1 className="text-2xl font-semibold">Welcome back</h1>
       <p className="text-muted-foreground mt-1 mb-6">Today&apos;s task is waiting.</p>
-      <LoginForm next={next} linkError={sp.error === "link"} googleEnabled={googleEnabled} />
+      <LoginForm
+        next={next}
+        linkError={sp.error === "link"}
+        googleEnabled={googleEnabled}
+        defaultEmail={sp.email?.slice(0, 254)}
+      />
       <p className="text-muted-foreground mt-6 text-center text-sm">
         New here?{" "}
         <Link

@@ -5,6 +5,8 @@ import { startDateForEnrollment, safeTimezone } from "@/lib/course-days";
 import { splitAmount } from "@/lib/pricing";
 import { resolveProduct, type ResolvedProduct } from "@/lib/products";
 import { sendWelcomeEmail } from "@/lib/emails";
+import { findOrCreateBuyer, setPasswordLink } from "@/lib/guest-accounts";
+import { getStripe } from "@/lib/stripe";
 import { sessionMetadataSchema } from "@/lib/validators/checkout";
 import type { Enrollment, Order, Profile } from "@/lib/types";
 
@@ -19,12 +21,18 @@ export interface FulfillInput {
   stripePaymentIntentId: string | null;
   /** Set for the free (100% coupon) path, where the order row already exists. */
   existingOrderId?: string;
+  /** Guest checkout: the email used at Stripe. */
+  guestEmail?: string | null;
+  /** Guest checkout: this payment created the buyer's account. */
+  createdAccount?: boolean;
 }
 
 export interface FulfillResult {
   order: Order;
   enrollments: Enrollment[];
   created: number;
+  /** The buyer already held every course in what they bought. */
+  alreadyOwned: boolean;
 }
 
 /**
@@ -63,6 +71,9 @@ export async function fulfillPurchase(input: FulfillInput): Promise<FulfillResul
           course_id: product.kind === "course" ? product.id : null,
           bundle_id: product.kind === "bundle" ? product.id : null,
           utm_campaign: input.utmCampaign,
+          ...(input.guestEmail ? { guest_email: input.guestEmail } : {}),
+          // Only ever switched on, so a retry can't erase it.
+          ...(input.createdAccount ? { created_account: true } : {}),
         },
         { onConflict: "stripe_checkout_session_id" },
       )
@@ -126,9 +137,7 @@ export async function fulfillPurchase(input: FulfillInput): Promise<FulfillResul
     created = (data ?? []) as Enrollment[];
   }
   if (targets.length === 0) {
-    console.error(
-      `[fulfillment] order ${order.id} paid but learner already holds every course — needs a manual refund`,
-    );
+    console.error(`[fulfillment] order ${order.id} paid but the buyer already holds every course`);
   }
 
   // 4. Coupon (best effort for paid orders — the money is already taken)
@@ -152,6 +161,7 @@ export async function fulfillPurchase(input: FulfillInput): Promise<FulfillResul
       paid: !isFree,
       graceDays: product.kind === "course" ? product.courses[0].grace_days : 0,
       path: product.kind === "course" ? `/dashboard/courses/${product.slug}` : "/dashboard",
+      setPasswordUrl: input.createdAccount ? await setPasswordLink(profile.email) : null,
     });
   }
 
@@ -159,6 +169,7 @@ export async function fulfillPurchase(input: FulfillInput): Promise<FulfillResul
     order,
     enrollments: [...existing.filter((e) => e.order_id === order.id), ...created],
     created: created.length,
+    alreadyOwned: targets.length === 0,
   };
 }
 
@@ -172,22 +183,85 @@ export async function fulfillCheckoutSession(
     console.error(`[fulfillment] session ${session.id} has unexpected metadata`);
     return null;
   }
+  const m = meta.data;
   const product = await resolveProduct(
-    { courseId: meta.data.courseId || null, bundleId: meta.data.bundleId || null },
+    { courseId: m.courseId || null, bundleId: m.bundleId || null },
     false,
   );
   const total = session.amount_total ?? 0;
-  return fulfillPurchase({
-    userId: meta.data.userId,
+  const paymentIntentId =
+    typeof session.payment_intent === "string"
+      ? session.payment_intent
+      : (session.payment_intent?.id ?? null);
+
+  // Who is this for? A logged-in buyer, or a guest identified by the email
+  // they gave Stripe.
+  let userId = m.userId || null;
+  let createdAccount = false;
+  let guestEmail: string | null = null;
+  if (!userId) {
+    const db = createAdminClient();
+    const { data: prior } = await db
+      .from("orders")
+      .select("user_id, created_account")
+      .eq("stripe_checkout_session_id", session.id)
+      .maybeSingle();
+    guestEmail =
+      (session.customer_details?.email ?? session.customer_email ?? "").trim().toLowerCase() ||
+      null;
+    if (prior?.user_id) {
+      userId = prior.user_id as string;
+      createdAccount = prior.created_account === true;
+    } else {
+      if (!guestEmail) {
+        console.error(`[fulfillment] guest session ${session.id} has no email`);
+        return null;
+      }
+      const buyer = await findOrCreateBuyer({
+        email: guestEmail,
+        name: session.customer_details?.name ?? null,
+        timezone: m.timezone ?? null,
+        attribution: {
+          source: m.attrSource,
+          medium: m.attrMedium,
+          campaign: m.utmCampaign,
+          landing: m.attrLanding,
+          referrer: m.attrReferrer,
+        },
+      });
+      userId = buyer.userId;
+      createdAccount = buyer.created;
+    }
+  }
+
+  const result = await fulfillPurchase({
+    userId,
     product,
     amountTotalCents: total,
-    amountDiscountCents: Math.max(0, meta.data.priceCents - total),
-    couponId: meta.data.couponId || null,
-    utmCampaign: meta.data.utmCampaign || null,
+    amountDiscountCents: Math.max(0, m.priceCents - total),
+    couponId: m.couponId || null,
+    utmCampaign: m.utmCampaign || null,
     stripeSessionId: session.id,
-    stripePaymentIntentId:
-      typeof session.payment_intent === "string"
-        ? session.payment_intent
-        : (session.payment_intent?.id ?? null),
+    stripePaymentIntentId: paymentIntentId,
+    guestEmail,
+    createdAccount,
   });
+
+  // Bought something they already own (possible when not logged in): refund it.
+  if (result.alreadyOwned && total > 0 && paymentIntentId && result.order.status !== "refunded") {
+    await getStripe().refunds.create(
+      {
+        payment_intent: paymentIntentId,
+        reason: "duplicate",
+        metadata: { orderId: result.order.id },
+      },
+      { idempotencyKey: `duplicate_${session.id}` },
+    );
+    await createAdminClient()
+      .from("orders")
+      .update({ status: "refunded", amount_refunded_cents: total })
+      .eq("id", result.order.id);
+    console.info(`[fulfillment] order ${result.order.id}: already owned, refunded automatically`);
+  }
+  return result;
 }

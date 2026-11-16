@@ -21,6 +21,8 @@ export function sendWelcomeEmail(input: {
   paid: boolean;
   graceDays: number;
   path: string;
+  /** Set for an account created by this purchase: a link to choose a password. */
+  setPasswordUrl?: string | null;
 }) {
   const rule =
     input.graceDays > 0
@@ -40,6 +42,9 @@ export function sendWelcomeEmail(input: {
       guarantee_line: input.paid
         ? `Remember the guarantee: ${rule}, and if you're not happy at the end you get a one-click refund.`
         : "Show up every day — it's the only rule.",
+      account_line: input.setPasswordUrl
+        ? `We created your account with this email. [Choose your password](${input.setPasswordUrl}) so you can log in on any device.`
+        : "",
     },
     buttonUrl: siteUrl(input.path),
   });

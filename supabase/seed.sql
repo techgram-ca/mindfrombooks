@@ -323,7 +323,9 @@ Welcome to **{{course_name}}** — {{days}} days, one small action a day.
 
 **{{start_line}}** Each day you get one task and answer one question. A day''s task closes at 11:59 pm your time, so try to do it early.
 
-{{guarantee_line}}', 'Open my dashboard'),
+{{guarantee_line}}
+
+{{account_line}}', 'Open my dashboard'),
   ('daily_reminder', 'Day {{day}} of {{course_name}} is ready: {{task_title}}', 'Hi {{name}},
 
 Today''s task for **{{course_name}}** (Day {{day}} of {{days}}):

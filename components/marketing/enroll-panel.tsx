@@ -97,7 +97,11 @@ export function EnrollPanel({ product, priceCents, note, showStickyBar = true }:
       const res = await fetch("/api/checkout", {
         method: "POST",
         headers: { "content-type": "application/json" },
-        body: JSON.stringify({ ...productKey, code: applied?.code }),
+        body: JSON.stringify({
+          ...productKey,
+          code: applied?.code,
+          timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+        }),
       });
       if (res.status === 401) {
         router.push(`/signup?next=${encodeURIComponent(returnPath)}`);

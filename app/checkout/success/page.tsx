@@ -2,10 +2,10 @@ import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { SuccessPoller } from "@/components/dashboard/success-poller";
 import { Logo } from "@/components/shared/logo";
-import { requireUser } from "@/lib/auth";
 
 export const metadata: Metadata = { title: "You're in!", robots: { index: false } };
 
+// Works logged out: people can pay first and create their account here.
 export default async function CheckoutSuccessPage({
   searchParams,
 }: {
@@ -13,7 +13,6 @@ export default async function CheckoutSuccessPage({
 }) {
   const { session_id: sessionId } = await searchParams;
   if (!sessionId) redirect("/dashboard");
-  await requireUser(`/checkout/success?session_id=${encodeURIComponent(sessionId)}`);
   return (
     <div className="flex min-h-dvh flex-col">
       <header className="container-page py-5">

@@ -142,6 +142,29 @@ Setting a course to fewer days hides the later tasks but keeps their content, so
 
 ---
 
+## Pay-first checkout
+
+Visitors don't need an account to buy:
+
+1. **Enroll** goes straight to Stripe Checkout, which asks for their email.
+2. After payment, the webhook (or the success page, whichever is first) creates the account from
+   that email, already confirmed, and enrolls them. The course starts the next day in the timezone
+   their browser reported.
+3. The success page asks only for a first name and a password, then logs them in. This is allowed
+   once, within 24 hours, and only for an account the payment itself created.
+4. If the email already has an account, the course is added to it and the page asks them to log in
+   — it never lets anyone set the password of an existing account.
+5. The welcome email includes a "choose your password" link, in case they closed the page.
+6. Buying a course you already own while logged out is refunded automatically.
+
+Free (100% coupon) enrollments still need an account first, so one-per-person codes stay one per
+person. For guests, a one-per-person code is checked against the account after payment; if it was
+already used, the payment still stands (the discount just isn't counted twice).
+
+Needs migration `20261118000002_guest_checkout.sql` **before** deploying this code.
+
+---
+
 ## Ratings and testimonials
 
 - When a learner finishes a course, the completion page asks for a 1–5 star rating and an optional
@@ -153,12 +176,7 @@ Setting a course to fewer days hides the later tasks but keeps their content, so
 - Course pages show up to 8 of these in a column under the enroll box, plus the average rating once
   a course has at least 3 ratings.
 
-Run migrations `20261117000001_ratings_testimonials.sql` and `20261117000002_testimonial_dev_samples.sql`.
-
-**Previewing on dev or staging:** `supabase/dev/sample_testimonials.sql` adds 5–7 placeholder quotes
-per course so you can see the layout. They are stored as dev samples, carry a "Sample" label, and the
-app never shows them on the production deployment. Never run that file on the production database;
-`supabase/dev/remove_sample_testimonials.sql` deletes them.
+Run migrations `20261117000001_ratings_testimonials.sql` and `20261118000001_remove_dev_samples.sql`.
 
 ---
 
