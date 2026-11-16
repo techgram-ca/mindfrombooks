@@ -6,7 +6,7 @@ import { BookCard } from "@/components/marketing/book-card";
 import { EnrollPanel } from "@/components/marketing/enroll-panel";
 import { Faq } from "@/components/marketing/faq";
 import { GuaranteeBanner } from "@/components/marketing/guarantee";
-import { Testimonials } from "@/components/marketing/testimonials";
+import { CourseTestimonials } from "@/components/marketing/testimonials";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
   getCourseBySlug,
@@ -14,6 +14,7 @@ import {
   getPublishedCourses,
   getSampleTasks,
   getSettings,
+  getRatingSummary,
   getTestimonials,
 } from "@/lib/queries/catalog";
 import { formatUsd } from "@/lib/pricing";
@@ -44,11 +45,12 @@ export default async function CoursePage({ params }: { params: Params }) {
   const detail = await getCourseBySlug(slug);
   if (!detail) notFound();
   const { course, books, phases } = detail;
-  const [samples, outline, settings, testimonials] = await Promise.all([
+  const [samples, outline, settings, testimonials, ratingSummary] = await Promise.all([
     getSampleTasks(course),
     getOutline(course),
     getSettings(),
-    getTestimonials(course.id, 3),
+    getTestimonials(course.id, 8),
+    getRatingSummary(course.id),
   ]);
   const sampleDays = new Set(samples.map((s) => s.day_number));
   const locked = outline.filter((o) => !sampleDays.has(o.day_number));
@@ -257,7 +259,7 @@ export default async function CoursePage({ params }: { params: Params }) {
 
           <GuaranteeBanner graceDays={course.grace_days} windowDays={settings.refund_window_days} />
 
-          <Testimonials items={testimonials} title={`From people doing ${course.name}`} />
+          <CourseTestimonials items={testimonials} summary={ratingSummary} className="md:hidden" />
 
           {course.faq.length > 0 && (
             <section aria-labelledby="course-faq-title">
@@ -268,7 +270,9 @@ export default async function CoursePage({ params }: { params: Params }) {
             </section>
           )}
         </div>
-        <div aria-hidden className="hidden md:block" />
+        <aside className="hidden md:block">
+          <CourseTestimonials items={testimonials} summary={ratingSummary} />
+        </aside>
       </div>
     </div>
   );

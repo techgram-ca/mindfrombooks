@@ -1,6 +1,7 @@
 import "server-only";
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 import { SUPABASE_URL, supabaseSecretKey } from "@/lib/supabase/env";
+import { freshFetch } from "@/lib/supabase/fresh-fetch";
 
 let cached: SupabaseClient | null = null;
 
@@ -17,6 +18,9 @@ export function createAdminClient(): SupabaseClient {
       "Supabase is not configured: set NEXT_PUBLIC_SUPABASE_URL and SUPABASE_SECRET_KEY",
     );
   }
-  cached = createClient(url, key, { auth: { autoRefreshToken: false, persistSession: false } });
+  cached = createClient(url, key, {
+    auth: { autoRefreshToken: false, persistSession: false },
+    global: { fetch: freshFetch },
+  });
   return cached;
 }
