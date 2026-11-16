@@ -561,3 +561,32 @@ export async function refreshPublicPagesAction(): Promise<AdminResult> {
   refreshSite();
   return { message: "Public pages refreshed. Reload a course page to see the latest content." };
 }
+
+// ------------------------------------------------------------------ support inbox
+export async function setSupportStatusAction(
+  id: string,
+  status: "open" | "resolved",
+): Promise<AdminResult> {
+  await requireAdmin();
+  if (!uuid.safeParse(id).success) return { error: "Invalid request." };
+  const { error } = await createAdminClient()
+    .from("support_messages")
+    .update({ status, resolved_at: status === "resolved" ? new Date().toISOString() : null })
+    .eq("id", id);
+  if (error) return { error: error.message };
+  revalidatePath("/admin", "layout");
+  return { message: status === "resolved" ? "Marked as resolved." : "Reopened." };
+}
+
+export async function saveSupportNoteAction(id: string, note: string): Promise<AdminResult> {
+  await requireAdmin();
+  const parsed = z.object({ id: uuid, note: z.string().trim().max(2000) }).safeParse({ id, note });
+  if (!parsed.success) return issue(parsed.error);
+  const { error } = await createAdminClient()
+    .from("support_messages")
+    .update({ admin_note: parsed.data.note || null })
+    .eq("id", parsed.data.id);
+  if (error) return { error: error.message };
+  revalidatePath("/admin/support");
+  return { message: "Note saved." };
+}

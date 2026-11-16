@@ -16,6 +16,7 @@ const groups = [
     title: "Company",
     links: [
       { href: "/about", label: "About" },
+      { href: "/contact", label: "Contact us" },
       { href: INSTAGRAM_URL, label: "Instagram" },
       { href: "/login", label: "Log in" },
     ],
@@ -58,6 +59,17 @@ export function SiteFooter() {
           © {new Date().getFullYear()} mindfrombooks. Prices are in US dollars. Courses are inspired
           by the books named and are not affiliated with, authorised or endorsed by their authors or
           publishers.
+        </p>
+        <p className="mt-2">
+          Developed by{" "}
+          <a
+            href="https://techgram.ca"
+            target="_blank"
+            rel="noopener"
+            className="hover:text-foreground font-medium underline underline-offset-2"
+          >
+            Techgram
+          </a>
         </p>
       </div>
     </footer>
