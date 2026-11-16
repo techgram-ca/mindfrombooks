@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { handle, jsonError, parseBody } from "@/lib/api";
-import { requireUserApi } from "@/lib/auth";
+import { getSessionProfile } from "@/lib/auth";
+import { isValidTimezone } from "@/lib/course-days";
 import { readAttribution } from "@/lib/attribution.server";
 import { checkCoupon } from "@/lib/coupons.server";
 import { fulfillPurchase } from "@/lib/fulfillment";
@@ -12,8 +13,11 @@ import { siteUrl } from "@/lib/utils";
 import { checkoutSchema } from "@/lib/validators/checkout";
 
 export const POST = handle(async (request: Request) => {
-  const profile = await requireUserApi();
-  if (!rateLimit(`checkout:${profile.id}`, 10, 60_000)) {
+  // Logged out is fine: a paid purchase creates the account after payment.
+  const profile = await getSessionProfile();
+  const who =
+    profile?.id ?? request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ?? "anon";
+  if (!rateLimit(`checkout:${who}`, 10, 60_000)) {
     return jsonError(429, "Too many tries. Wait a minute and try again.");
   }
   const body = await parseBody(request, checkoutSchema);
@@ -21,16 +25,20 @@ export const POST = handle(async (request: Request) => {
   const db = createAdminClient();
 
   // Already enrolled? (A bundle is blocked only when every course is held.)
-  const { data: held } = await db
-    .from("enrollments")
-    .select("course_id")
-    .eq("user_id", profile.id)
-    .in(
-      "course_id",
-      product.courses.map((c) => c.id),
-    );
+  // Guests can't be checked here; if they turn out to own it, fulfilment
+  // refunds the payment automatically.
+  const { data: held } = profile
+    ? await db
+        .from("enrollments")
+        .select("course_id")
+        .eq("user_id", profile.id)
+        .in(
+          "course_id",
+          product.courses.map((c) => c.id),
+        )
+    : { data: [] };
   const heldCount = held?.length ?? 0;
-  if (heldCount >= product.courses.length) {
+  if (profile && heldCount >= product.courses.length) {
     return NextResponse.json(
       {
         owned: true,
@@ -49,7 +57,7 @@ export const POST = handle(async (request: Request) => {
   let finalCents = product.priceCents;
   let couponId: string | null = null;
   if (body.code) {
-    const { coupon, result } = await checkCoupon(body.code, product, profile.id);
+    const { coupon, result } = await checkCoupon(body.code, product, profile?.id ?? null);
     if (!result.ok || !coupon) {
       return jsonError(400, result.ok ? "That code didn't work." : result.message);
     }
@@ -57,10 +65,19 @@ export const POST = handle(async (request: Request) => {
     couponId = coupon.id;
   }
   const discountCents = product.priceCents - finalCents;
-  const utmCampaign = (await readAttribution())?.campaign ?? profile.signup_campaign ?? null;
+  const attribution = await readAttribution();
+  const utmCampaign = attribution?.campaign ?? profile?.signup_campaign ?? null;
+
+  // ---- Free with a code: needs an account, so one-per-person codes stay one per person.
+  if (finalCents === 0 && !profile) {
+    return NextResponse.json(
+      { signup: true, error: "Create a free account to use this code." },
+      { status: 401 },
+    );
+  }
 
   // ---- Free: skip Stripe and enroll straight away
-  if (finalCents === 0) {
+  if (finalCents === 0 && profile) {
     const { data: order, error } = await db
       .from("orders")
       .insert({
@@ -121,8 +138,9 @@ export const POST = handle(async (request: Request) => {
   // ---- Paid: Stripe Checkout
   const session = await getStripe().checkout.sessions.create({
     mode: "payment",
-    customer_email: profile.email,
-    client_reference_id: profile.id,
+    // Logged in: we know the email. Guest: Stripe asks for it, and the account
+    // is created from it after payment.
+    ...(profile ? { customer_email: profile.email, client_reference_id: profile.id } : {}),
     line_items: [
       {
         quantity: 1,
@@ -139,7 +157,12 @@ export const POST = handle(async (request: Request) => {
       },
     ],
     metadata: {
-      userId: profile.id,
+      userId: profile?.id ?? "",
+      timezone: body.timezone && isValidTimezone(body.timezone) ? body.timezone : "",
+      attrSource: profile ? "" : (attribution?.source ?? ""),
+      attrMedium: profile ? "" : (attribution?.medium ?? ""),
+      attrLanding: profile ? "" : (attribution?.landing ?? ""),
+      attrReferrer: profile ? "" : (attribution?.referrer ?? ""),
       courseId: product.kind === "course" ? product.id : "",
       bundleId: product.kind === "bundle" ? product.id : "",
       couponId: couponId ?? "",
@@ -147,7 +170,7 @@ export const POST = handle(async (request: Request) => {
       priceCents: String(product.priceCents),
     },
     payment_intent_data: {
-      metadata: { userId: profile.id, product: product.slug },
+      metadata: { userId: profile?.id ?? "guest", product: product.slug },
     },
     success_url: siteUrl("/checkout/success?session_id={CHECKOUT_SESSION_ID}"),
     cancel_url: siteUrl(

@@ -11,7 +11,7 @@ export const DEFAULT_TEMPLATES: Record<EmailTemplateKey, EmailTemplate> = {
     key: "welcome",
     subject: "You're in — welcome to {{course_name}}",
     body_markdown:
-      "Hi {{name}},\n\nWelcome to **{{course_name}}** — {{days}} days, one small action a day.\n\n**{{start_line}}** Each day you get one task and answer one question. A day's task closes at 11:59 pm your time, so try to do it early.\n\n{{guarantee_line}}",
+      "Hi {{name}},\n\nWelcome to **{{course_name}}** — {{days}} days, one small action a day.\n\n**{{start_line}}** Each day you get one task and answer one question. A day's task closes at 11:59 pm your time, so try to do it early.\n\n{{guarantee_line}}\n\n{{account_line}}",
     button_label: "Open my dashboard",
   },
   daily_reminder: {
@@ -52,7 +52,7 @@ export const DEFAULT_TEMPLATES: Record<EmailTemplateKey, EmailTemplate> = {
 };
 
 export const TEMPLATE_VARIABLES: Record<EmailTemplateKey, string[]> = {
-  welcome: ["name", "course_name", "days", "start_line", "guarantee_line"],
+  welcome: ["name", "course_name", "days", "start_line", "guarantee_line", "account_line"],
   daily_reminder: ["name", "course_name", "day", "days", "task_title", "more_line"],
   missed_yesterday: ["name", "course_name", "day", "days", "task_title", "grace_line"],
   course_complete: ["name", "course_name", "days", "responded", "refund_line", "next_course_line"],

@@ -20,12 +20,24 @@ export const validateCouponSchema = z
   .refine(exactlyOne, "Choose a course or the bundle.");
 
 export const checkoutSchema = z
-  .object({ code: couponCodeSchema.optional(), ...productShape })
+  .object({
+    code: couponCodeSchema.optional(),
+    // The visitor's timezone, so a course bought before signing up starts on
+    // the right local day.
+    timezone: z.string().max(64).optional(),
+    ...productShape,
+  })
   .refine(exactlyOne, "Choose a course or the bundle.");
 
 /** Metadata we put on the Stripe Checkout Session and read back in the webhook. */
 export const sessionMetadataSchema = z.object({
-  userId: z.string().uuid(),
+  /** Empty for a guest checkout: the account is created after payment. */
+  userId: z.string().uuid().or(z.literal("")).optional(),
+  timezone: z.string().max(64).optional(),
+  attrSource: z.string().max(200).optional(),
+  attrMedium: z.string().max(200).optional(),
+  attrLanding: z.string().max(200).optional(),
+  attrReferrer: z.string().max(200).optional(),
   courseId: z.string().uuid().optional().or(z.literal("")),
   bundleId: z.string().uuid().optional().or(z.literal("")),
   couponId: z.string().uuid().optional().or(z.literal("")),
