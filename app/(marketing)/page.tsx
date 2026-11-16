@@ -194,7 +194,7 @@ export default async function HomePage() {
         </div>
       </section>
 
-      <section className="container-narrow py-10" aria-labelledby="faq-title">
+      <section className="container-page py-10" aria-labelledby="faq-title">
         <h2 id="faq-title" className="mb-6 text-2xl font-semibold sm:text-3xl">
           Questions
         </h2>

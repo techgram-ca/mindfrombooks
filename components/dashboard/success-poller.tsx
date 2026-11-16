@@ -238,7 +238,11 @@ export function SuccessPoller({ sessionId }: { sessionId: string }) {
         <p className="text-muted-foreground mt-3 max-w-md">
           Your payment went through, but your course is taking longer than usual to appear.
           We&apos;ll email you a link to log in as soon as it&apos;s ready. If nothing arrives
-          within a few minutes, reply to your receipt email and we&apos;ll sort it out.
+          within a few minutes,{" "}
+          <Link href="/contact?topic=payment" className="underline">
+            contact us
+          </Link>{" "}
+          and we&apos;ll sort it out.
         </p>
         <Button className="mt-7" onClick={() => window.location.reload()}>
           Check again
