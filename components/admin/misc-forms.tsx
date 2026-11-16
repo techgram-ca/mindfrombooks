@@ -355,7 +355,8 @@ export function SetDayForm({
         <Label htmlFor={id} className="text-muted-foreground text-xs">
           Jump to day
         </Label>
-        <Select id={id} className="h-9 w-40" value={day} onChange={(e) => setDay(e.target.value)}>
+        <Select id={id} className="h-9 w-64" value={day} onChange={(e) => setDay(e.target.value)}>
+          <option value="-1">Not started (learner taps Start)</option>
           <option value="0">Starts tomorrow</option>
           {Array.from({ length: totalDays }, (_, i) => (
             <option key={i + 1} value={i + 1}>

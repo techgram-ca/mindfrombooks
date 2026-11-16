@@ -366,13 +366,14 @@ export async function restoreEnrollmentAction(enrollmentId: string): Promise<Adm
 
 const setDaySchema = z.object({
   enrollmentId: uuid,
-  day: z.coerce.number().int().min(0).max(367),
+  // -1 = not started (the learner has to tap Start), 0 = starts tomorrow
+  day: z.coerce.number().int().min(-1).max(367),
   responses: z.enum(["keep", "fill", "clear"]),
 });
 
 /**
  * Testing tool: move a learner to any day of a course by shifting the
- * enrollment's start date. Day 0 = "starts tomorrow"; a day past the end =
+ * enrollment's start date. -1 = "not started"; day 0 = "starts tomorrow"; a day past the end =
  * "finished yesterday". Optionally mark the earlier days as answered (to see
  * the on-track / refund-eligible states) or clear every response.
  */
@@ -395,7 +396,8 @@ export async function setEnrollmentDayAction(input: unknown): Promise<AdminResul
   const total = row.courses.days;
   const day = Math.min(parsed.data.day, total + 1);
   const today = todayInTz(row.timezone);
-  const startDate = addDays(today, 1 - day); // day 0 → tomorrow, day 1 → today
+  // -1 → no start date, day 0 → tomorrow, day 1 → today
+  const startDate = day < 0 ? null : addDays(today, 1 - day);
 
   const { error } = await db
     .from("enrollments")
@@ -432,11 +434,13 @@ export async function setEnrollmentDayAction(input: unknown): Promise<AdminResul
   revalidatePath(`/admin/users/${row.user_id}`);
   return {
     message:
-      day === 0
-        ? `${row.courses.name} now starts tomorrow.`
-        : day > total
-          ? `${row.courses.name} now finished yesterday.`
-          : `${row.courses.name} is now on Day ${day} of ${total}.`,
+      day < 0
+        ? `${row.courses.name} is back to not started — the learner taps Start to begin.`
+        : day === 0
+          ? `${row.courses.name} now starts tomorrow.`
+          : day > total
+            ? `${row.courses.name} now finished yesterday.`
+            : `${row.courses.name} is now on Day ${day} of ${total}.`,
   };
 }
 
