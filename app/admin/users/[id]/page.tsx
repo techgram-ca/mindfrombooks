@@ -171,7 +171,10 @@ export default async function AdminUserPage({ params }: { params: Promise<{ id: 
                   <td className="font-medium">
                     {e.courses.emoji} {e.courses.name}
                     <div className="text-muted-foreground font-normal">
-                      {e.start_date ? `Starts ${e.start_date}` : "Not started"} · {e.timezone}
+                      {e.start_date
+                        ? `Day 1 is ${e.start_date}`
+                        : "Not started — waiting for the learner to tap Start"}{" "}
+                      · {e.timezone}
                     </div>
                   </td>
                   <td>
@@ -194,7 +197,11 @@ export default async function AdminUserPage({ params }: { params: Promise<{ id: 
                     </Badge>
                   </td>
                   <td>
-                    Day {p.currentDay}/{e.courses.days}
+                    {!e.start_date
+                      ? "Not started"
+                      : p.currentDay === 0
+                        ? "Starts tomorrow"
+                        : `Day ${p.currentDay}/${e.courses.days}`}
                     <div className="text-muted-foreground">
                       {p.respondedCount} done · {p.missedDays.length} missed
                     </div>
@@ -215,7 +222,7 @@ export default async function AdminUserPage({ params }: { params: Promise<{ id: 
                           enrollmentId={e.id}
                           currentDay={
                             !e.start_date
-                              ? 0
+                              ? -1
                               : isPastFinalDay(e.start_date, todayInTz(e.timezone), e.courses.days)
                                 ? e.courses.days + 1
                                 : p.currentDay

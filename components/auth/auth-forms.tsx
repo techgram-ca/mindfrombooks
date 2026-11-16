@@ -42,7 +42,15 @@ function Divider() {
   );
 }
 
-export function LoginForm({ next, linkError }: { next: string; linkError?: boolean }) {
+export function LoginForm({
+  next,
+  linkError,
+  googleEnabled = false,
+}: {
+  next: string;
+  linkError?: boolean;
+  googleEnabled?: boolean;
+}) {
   const [state, action] = useActionState(loginAction, initial);
   return (
     <div className="space-y-5">
@@ -53,8 +61,12 @@ export function LoginForm({ next, linkError }: { next: string; linkError?: boole
           }}
         />
       )}
-      <GoogleButton next={next} label="Continue with Google" />
-      <Divider />
+      {googleEnabled && (
+        <>
+          <GoogleButton next={next} label="Continue with Google" />
+          <Divider />
+        </>
+      )}
       <form action={action} className="space-y-4">
         <input type="hidden" name="next" value={next} />
         <div>
@@ -111,7 +123,13 @@ export function useTimezones(): { detected: string; all: string[] } {
   return { detected, all };
 }
 
-export function SignupForm({ next }: { next: string }) {
+export function SignupForm({
+  next,
+  googleEnabled = false,
+}: {
+  next: string;
+  googleEnabled?: boolean;
+}) {
   const [state, action] = useActionState(signupAction, initial);
   const { detected, all } = useTimezones();
   const [timezone, setTimezone] = useState<string | null>(null);
@@ -124,14 +142,22 @@ export function SignupForm({ next }: { next: string }) {
         </div>
         <h2 className="text-xl font-semibold">Check your email</h2>
         <p className="text-muted-foreground">{state.message}</p>
+        <p className="bg-accent-soft text-accent-strong rounded-xl px-3.5 py-2.5 text-sm">
+          Can&apos;t find it? Check your spam or junk folder — it sometimes lands there. Mark it as
+          “not spam” so the daily reminders reach your inbox too.
+        </p>
       </div>
     );
   }
 
   return (
     <div className="space-y-5">
-      <GoogleButton next={next} label="Sign up with Google" />
-      <Divider />
+      {googleEnabled && (
+        <>
+          <GoogleButton next={next} label="Sign up with Google" />
+          <Divider />
+        </>
+      )}
       <form action={action} className="space-y-4">
         <input type="hidden" name="next" value={next} />
         <div>

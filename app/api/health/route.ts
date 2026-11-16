@@ -90,5 +90,30 @@ export async function GET() {
   if (database.secret_key_reads_tasks === "ok (0 rows)")
     problems.push("No tasks found — run the seed.");
 
-  return NextResponse.json({ ok: problems.length === 0, problems, env, database, functions });
+  // Informational: sign-in methods switched on in Supabase (the Google button is hidden when off).
+  let signIn: Record<string, boolean> | string = "unknown";
+  if (SUPABASE_URL && SUPABASE_PUBLISHABLE_KEY) {
+    try {
+      const res = await fetch(`${SUPABASE_URL}/auth/v1/settings`, {
+        headers: { apikey: SUPABASE_PUBLISHABLE_KEY },
+        cache: "no-store",
+      });
+      const settings = (await res.json()) as { external?: Record<string, boolean> };
+      signIn = {
+        email: settings.external?.email === true,
+        google: settings.external?.google === true,
+      };
+    } catch {
+      signIn = "could not be checked";
+    }
+  }
+
+  return NextResponse.json({
+    ok: problems.length === 0,
+    problems,
+    env,
+    database,
+    functions,
+    signIn,
+  });
 }

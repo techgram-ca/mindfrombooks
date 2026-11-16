@@ -6,14 +6,28 @@ import { StartCourseButton } from "@/components/dashboard/start-course-button";
 import { formatDateLong } from "@/lib/course-days";
 import { phaseNameFor, type EnrollmentView } from "@/lib/queries/learning";
 
+/**
+ * Courses whose daily book insight is NOT repeated on the Today screen. The AI
+ * course is about doing the steps, so its card stays short; the insight is
+ * still on the task page.
+ */
+const NO_DASHBOARD_INSIGHT = new Set(["ai-for-everyday-life"]);
+
+export function showsDashboardInsight(course: { slug: string }): boolean {
+  return !NO_DASHBOARD_INSIGHT.has(course.slug);
+}
+
 export function TodayCard({
   view,
   taskTitle,
   hoursLeft,
+  insight,
 }: {
   view: EnrollmentView;
   taskTitle?: string;
   hoursLeft?: number;
+  /** Today's book insight, shown under the button for started courses. */
+  insight?: { text: string; reference: string };
 }) {
   const { course, progress, openDay } = view;
   const base = `/dashboard/courses/${course.slug}`;
@@ -105,6 +119,19 @@ export function TodayCard({
             >
               View or edit today&apos;s response
             </Link>
+          )}
+          {insight?.text && (
+            <div className="bg-surface-muted mt-4 rounded-xl p-4">
+              <p className="text-muted-foreground font-sans text-[11px] font-semibold tracking-[0.14em] uppercase">
+                Book insight of the day
+              </p>
+              <p className="mt-1.5 font-serif text-[15px] leading-relaxed">{insight.text}</p>
+              {insight.reference && (
+                <p className="text-muted-foreground mt-2 text-xs">
+                  Inspired by {insight.reference}
+                </p>
+              )}
+            </div>
           )}
         </>
       )}
