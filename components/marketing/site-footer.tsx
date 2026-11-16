@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { Logo } from "@/components/shared/logo";
-import { INSTAGRAM_URL, SUPPORT_EMAIL, TAGLINE } from "@/lib/utils";
+import { INSTAGRAM_URL, TAGLINE } from "@/lib/utils";
 
 const groups = [
   {
@@ -16,6 +16,7 @@ const groups = [
     title: "Company",
     links: [
       { href: "/about", label: "About" },
+      { href: "/contact", label: "Contact us" },
       { href: INSTAGRAM_URL, label: "Instagram" },
       { href: "/login", label: "Log in" },
     ],
@@ -60,14 +61,6 @@ export function SiteFooter() {
           publishers.
         </p>
         <p className="mt-2">
-          Questions?{" "}
-          <a
-            href={`mailto:${SUPPORT_EMAIL}`}
-            className="hover:text-foreground underline underline-offset-2"
-          >
-            {SUPPORT_EMAIL}
-          </a>
-          {" · "}
           Developed by{" "}
           <a
             href="https://techgram.ca"

@@ -10,12 +10,14 @@ const items = [
   { href: "/admin/orders", label: "Orders" },
   { href: "/admin/responses", label: "Responses" },
   { href: "/admin/testimonials", label: "Testimonials" },
+  { href: "/admin/support", label: "Support" },
   { href: "/admin/coupons", label: "Coupons" },
   { href: "/admin/emails", label: "Emails" },
   { href: "/admin/settings", label: "Settings" },
 ];
 
-export function AdminNav() {
+/** `openSupport` adds a count badge to the Support link. */
+export function AdminNav({ openSupport = 0 }: { openSupport?: number }) {
   const pathname = usePathname();
   return (
     <nav aria-label="Admin" className="flex gap-1 overflow-x-auto px-5 pb-2 md:px-8">
@@ -34,6 +36,14 @@ export function AdminNav() {
             )}
           >
             {i.label}
+            {i.href === "/admin/support" && openSupport > 0 && (
+              <span
+                className="bg-danger ml-1.5 inline-flex min-w-5 items-center justify-center rounded-full px-1.5 text-[11px] font-semibold text-white"
+                aria-label={`${openSupport} open`}
+              >
+                {openSupport}
+              </span>
+            )}
           </Link>
         );
       })}
