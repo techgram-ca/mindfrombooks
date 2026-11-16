@@ -6,7 +6,19 @@ function Quote({ t, compact }: { t: Testimonial; compact?: boolean }) {
   const max = compact ? 260 : 320;
   return (
     <figure className="rounded-card border-border bg-surface shadow-soft flex flex-col border p-5">
-      {t.stars != null && <Stars value={t.stars} className="mb-2" />}
+      {(t.stars != null || t.isSample) && (
+        <div className="mb-2 flex items-center justify-between gap-2">
+          {t.stars != null ? <Stars value={t.stars} /> : <span />}
+          {t.isSample && (
+            <span
+              className="border-danger/50 text-danger rounded-full border border-dashed px-2 py-0.5 text-[10px] font-semibold tracking-wide uppercase"
+              title="Placeholder for previewing the layout. Never shown on the live site."
+            >
+              Sample
+            </span>
+          )}
+        </div>
+      )}
       <blockquote className="text-foreground/90 text-[15px] leading-relaxed">
         “{t.body.length > max ? `${t.body.slice(0, max).trimEnd()}…` : t.body}”
       </blockquote>
@@ -74,7 +86,11 @@ export function CourseTestimonials({
         <Quote key={t.id} t={t} compact />
       ))}
       {items.length > 0 && (
-        <p className="text-muted-foreground text-xs">Shared with each learner&apos;s permission.</p>
+        <p className="text-muted-foreground text-xs">
+          {items.some((t) => t.isSample)
+            ? "Includes sample quotes for previewing the layout. They never appear on the live site."
+            : "Shared with each learner's permission."}
+        </p>
       )}
     </section>
   );

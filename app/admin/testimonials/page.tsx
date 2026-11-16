@@ -225,6 +225,9 @@ export default async function AdminTestimonialsPage() {
                 ) : (
                   <Badge variant="neutral">Hidden</Badge>
                 )}
+                {t.is_dev_sample && (
+                  <Badge variant="danger">Dev sample — never shown in production</Badge>
+                )}
                 <span className="text-muted-foreground w-full truncate text-sm">“{t.body}”</span>
               </summary>
               <div className="border-border space-y-4 border-t p-4">

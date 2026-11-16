@@ -152,6 +152,13 @@ export interface Testimonial {
   courseEmoji: string;
   /** Set when the quote is a daily response. */
   dayNumber: number | null;
+  /** Placeholder for previewing the layout on dev/staging. Never set in production. */
+  isSample: boolean;
+}
+
+/** Dev/staging sample testimonials are never shown on the production deployment. */
+export function showDevSamples(): boolean {
+  return process.env.VERCEL_ENV !== "production";
 }
 
 export interface RatingSummary {
@@ -195,12 +202,15 @@ export async function getTestimonials(courseId?: string, limit = 8): Promise<Tes
 
   let manual = db
     .from("testimonials")
-    .select("id, body, stars, name, country, sort_order, created_at, courses(name, emoji)")
+    .select(
+      "id, body, stars, name, country, sort_order, created_at, is_dev_sample, courses(name, emoji)",
+    )
     .eq("is_published", true)
     .order("sort_order")
     .order("created_at", { ascending: false })
     .limit(limit);
   if (courseId) manual = manual.eq("course_id", courseId);
+  if (!showDevSamples()) manual = manual.eq("is_dev_sample", false);
 
   const [r1, r2, r3] = await Promise.all([responses, ratings, manual]);
   for (const [label, res] of [
@@ -235,6 +245,7 @@ export async function getTestimonials(courseId?: string, limit = 8): Promise<Tes
     name: string;
     country: string | null;
     created_at: string;
+    is_dev_sample: boolean;
     courses: CourseLabel | null;
   };
 
@@ -248,6 +259,7 @@ export async function getTestimonials(courseId?: string, limit = 8): Promise<Tes
       courseName: m.courses?.name ?? "mindfrombooks",
       courseEmoji: m.courses?.emoji ?? "📚",
       dayNumber: null,
+      isSample: m.is_dev_sample === true,
       at: m.created_at,
       rank: 0,
     })),
@@ -260,6 +272,7 @@ export async function getTestimonials(courseId?: string, limit = 8): Promise<Tes
       courseName: r.courses.name,
       courseEmoji: r.courses.emoji,
       dayNumber: null,
+      isSample: false,
       at: r.updated_at,
       rank: 1,
     })),
@@ -272,6 +285,7 @@ export async function getTestimonials(courseId?: string, limit = 8): Promise<Tes
       courseName: r.enrollments.courses.name,
       courseEmoji: r.enrollments.courses.emoji,
       dayNumber: r.day_number,
+      isSample: false,
       at: r.updated_at,
       rank: 1,
     })),
@@ -288,6 +302,7 @@ export async function getTestimonials(courseId?: string, limit = 8): Promise<Tes
       courseName: t.courseName,
       courseEmoji: t.courseEmoji,
       dayNumber: t.dayNumber,
+      isSample: t.isSample,
     }));
 }
 

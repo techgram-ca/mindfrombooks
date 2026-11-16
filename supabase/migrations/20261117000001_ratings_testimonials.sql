@@ -32,12 +32,13 @@ create table public.testimonials (
   body text not null check (char_length(body) between 1 and 600),
   stars int check (stars between 1 and 5),
   source_note text not null check (char_length(source_note) between 3 and 300),
-  permission_confirmed boolean not null check (permission_confirmed),
+  permission_confirmed boolean not null,
   is_published boolean not null default true,
   sort_order int not null default 0,
   created_by uuid references public.profiles (id) on delete set null,
   created_at timestamptz not null default now(),
-  updated_at timestamptz not null default now()
+  updated_at timestamptz not null default now(),
+  constraint testimonials_permission_confirmed_check check (permission_confirmed)
 );
 create index testimonials_course_idx on public.testimonials (course_id);
 

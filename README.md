@@ -153,7 +153,12 @@ Setting a course to fewer days hides the later tasks but keeps their content, so
 - Course pages show up to 8 of these in a column under the enroll box, plus the average rating once
   a course has at least 3 ratings.
 
-Run `supabase/migrations/20261117000001_ratings_testimonials.sql` to create the two tables.
+Run migrations `20261117000001_ratings_testimonials.sql` and `20261117000002_testimonial_dev_samples.sql`.
+
+**Previewing on dev or staging:** `supabase/dev/sample_testimonials.sql` adds 5–7 placeholder quotes
+per course so you can see the layout. They are stored as dev samples, carry a "Sample" label, and the
+app never shows them on the production deployment. Never run that file on the production database;
+`supabase/dev/remove_sample_testimonials.sql` deletes them.
 
 ---
 

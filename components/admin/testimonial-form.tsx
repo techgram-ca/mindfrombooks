@@ -14,6 +14,7 @@ export interface ManualTestimonial {
   stars: number | null;
   source_note: string;
   is_published: boolean;
+  is_dev_sample?: boolean;
 }
 
 /** Add or edit a real quote received outside the app (DM, email, comment). */
