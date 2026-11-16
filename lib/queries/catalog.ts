@@ -146,41 +146,159 @@ export interface Testimonial {
   id: string;
   body: string;
   name: string;
+  country: string | null;
+  stars: number | null;
   courseName: string;
   courseEmoji: string;
-  dayNumber: number;
+  /** Set when the quote is a daily response. */
+  dayNumber: number | null;
 }
 
-/** Starred responses, shown with the display name the admin chose. */
-export async function getTestimonials(courseId?: string, limit = 6): Promise<Testimonial[]> {
+export interface RatingSummary {
+  average: number;
+  count: number;
+}
+
+/** Show an average only once there are enough real ratings for it to mean something. */
+export const MIN_RATINGS_TO_SHOW = 3;
+
+type CourseLabel = { name: string; emoji: string };
+
+/**
+ * Real testimonials only, from three sources:
+ *  - daily responses an admin starred (with the learner's permission)
+ *  - completion ratings whose comment the learner agreed to share, once published
+ *  - quotes an admin added by hand, recorded with where they came from
+ * Each source fails soft (for example before its migration has been run).
+ */
+export async function getTestimonials(courseId?: string, limit = 8): Promise<Testimonial[]> {
   if (!hasServiceRole()) return [];
-  let query = createAdminClient()
+  const db = createAdminClient();
+
+  let responses = db
     .from("responses")
     .select(
-      "id, body, testimonial_name, day_number, enrollments!inner(course_id, courses!inner(name, emoji))",
+      "id, body, testimonial_name, day_number, updated_at, enrollments!inner(course_id, courses!inner(name, emoji))",
     )
     .eq("is_starred", true)
     .order("updated_at", { ascending: false })
     .limit(limit);
-  if (courseId) query = query.eq("enrollments.course_id", courseId);
-  const { data, error } = await query;
-  if (error) {
-    console.error("[testimonials]", error.message);
-    return [];
+  if (courseId) responses = responses.eq("enrollments.course_id", courseId);
+
+  let ratings = db
+    .from("course_ratings")
+    .select("id, comment, stars, display_name, country, updated_at, courses!inner(name, emoji)")
+    .eq("is_published", true)
+    .order("updated_at", { ascending: false })
+    .limit(limit);
+  if (courseId) ratings = ratings.eq("course_id", courseId);
+
+  let manual = db
+    .from("testimonials")
+    .select("id, body, stars, name, country, sort_order, created_at, courses(name, emoji)")
+    .eq("is_published", true)
+    .order("sort_order")
+    .order("created_at", { ascending: false })
+    .limit(limit);
+  if (courseId) manual = manual.eq("course_id", courseId);
+
+  const [r1, r2, r3] = await Promise.all([responses, ratings, manual]);
+  for (const [label, res] of [
+    ["responses", r1],
+    ["course_ratings", r2],
+    ["testimonials", r3],
+  ] as const) {
+    if (res.error) console.error(`[testimonials] ${label}: ${res.error.message}`);
   }
-  type Row = {
+
+  type ResponseRow = {
     id: string;
     body: string;
     testimonial_name: string | null;
     day_number: number;
-    enrollments: { courses: { name: string; emoji: string } };
+    updated_at: string;
+    enrollments: { courses: CourseLabel };
   };
-  return ((data ?? []) as unknown as Row[]).map((r) => ({
-    id: r.id,
-    body: r.body,
-    name: r.testimonial_name?.trim() || "A mindfrombooks learner",
-    courseName: r.enrollments.courses.name,
-    courseEmoji: r.enrollments.courses.emoji,
-    dayNumber: r.day_number,
-  }));
+  type RatingRow = {
+    id: string;
+    comment: string;
+    stars: number;
+    display_name: string | null;
+    country: string | null;
+    updated_at: string;
+    courses: CourseLabel;
+  };
+  type ManualRow = {
+    id: string;
+    body: string;
+    stars: number | null;
+    name: string;
+    country: string | null;
+    created_at: string;
+    courses: CourseLabel | null;
+  };
+
+  const items: (Testimonial & { at: string; rank: number })[] = [
+    ...((r3.data ?? []) as unknown as ManualRow[]).map((m) => ({
+      id: `t-${m.id}`,
+      body: m.body,
+      name: m.name,
+      country: m.country,
+      stars: m.stars,
+      courseName: m.courses?.name ?? "mindfrombooks",
+      courseEmoji: m.courses?.emoji ?? "📚",
+      dayNumber: null,
+      at: m.created_at,
+      rank: 0,
+    })),
+    ...((r2.data ?? []) as unknown as RatingRow[]).map((r) => ({
+      id: `r-${r.id}`,
+      body: r.comment,
+      name: r.display_name?.trim() || "A mindfrombooks learner",
+      country: r.country,
+      stars: r.stars,
+      courseName: r.courses.name,
+      courseEmoji: r.courses.emoji,
+      dayNumber: null,
+      at: r.updated_at,
+      rank: 1,
+    })),
+    ...((r1.data ?? []) as unknown as ResponseRow[]).map((r) => ({
+      id: `s-${r.id}`,
+      body: r.body,
+      name: r.testimonial_name?.trim() || "A mindfrombooks learner",
+      country: null,
+      stars: null,
+      courseName: r.enrollments.courses.name,
+      courseEmoji: r.enrollments.courses.emoji,
+      dayNumber: r.day_number,
+      at: r.updated_at,
+      rank: 1,
+    })),
+  ];
+  return items
+    .sort((a, b) => a.rank - b.rank || b.at.localeCompare(a.at))
+    .slice(0, limit)
+    .map((t) => ({
+      id: t.id,
+      body: t.body,
+      name: t.name,
+      country: t.country,
+      stars: t.stars,
+      courseName: t.courseName,
+      courseEmoji: t.courseEmoji,
+      dayNumber: t.dayNumber,
+    }));
+}
+
+/** Average stars from completion ratings, or null when there are too few. */
+export async function getRatingSummary(courseId: string): Promise<RatingSummary | null> {
+  if (!hasServiceRole()) return null;
+  const { data, error } = await createAdminClient()
+    .from("course_ratings")
+    .select("stars")
+    .eq("course_id", courseId);
+  if (error || !data || data.length < MIN_RATINGS_TO_SHOW) return null;
+  const total = data.reduce((sum, r) => sum + (r.stars as number), 0);
+  return { average: Math.round((total / data.length) * 10) / 10, count: data.length };
 }

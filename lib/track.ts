@@ -14,7 +14,8 @@ export type TrackEvent =
   | "task_submitted"
   | "course_completed"
   | "refund_requested"
-  | "certificate_shared";
+  | "certificate_shared"
+  | "course_rated";
 
 export type TrackProps = Record<string, string | number | boolean | null>;
 

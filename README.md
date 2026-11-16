@@ -142,6 +142,21 @@ Setting a course to fewer days hides the later tasks but keeps their content, so
 
 ---
 
+## Ratings and testimonials
+
+- When a learner finishes a course, the completion page asks for a 1–5 star rating and an optional
+  comment. They choose whether the comment may be shown, and with which name and country.
+- Shared comments wait in **Admin → Testimonials** until you publish them. Comments a learner did
+  not agree to share can never be published (the database enforces it).
+- You can also add quotes that reached you elsewhere (Instagram DMs, email). Each one records where
+  it came from and needs a tick confirming it is a real customer's words, used with permission.
+- Course pages show up to 8 of these in a column under the enroll box, plus the average rating once
+  a course has at least 3 ratings.
+
+Run `supabase/migrations/20261117000001_ratings_testimonials.sql` to create the two tables.
+
+---
+
 ## Course content
 
 All 217 days are written in `scripts/content/`, one file per course. Every day cites the book its

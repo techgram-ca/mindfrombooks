@@ -13,6 +13,7 @@ import {
   courseSchema,
   emailTemplateSchema,
   grantSchema,
+  manualTestimonialSchema,
   settingsSchema,
   taskSchema,
   testimonialSchema,
@@ -480,4 +481,73 @@ export async function saveTestimonialAction(input: unknown): Promise<AdminResult
   if (error) return { error: error.message };
   refreshSite();
   return { message: fields.is_starred ? "Shown as a testimonial." : "Removed from testimonials." };
+}
+
+// ------------------------------------------------------------------ ratings + testimonials
+export async function setRatingPublishedAction(
+  id: string,
+  published: boolean,
+): Promise<AdminResult> {
+  await requireAdmin();
+  if (!uuid.safeParse(id).success) return { error: "Invalid request." };
+  const db = createAdminClient();
+  const { data } = await db
+    .from("course_ratings")
+    .select("share_ok, comment")
+    .eq("id", id)
+    .maybeSingle();
+  if (!data) return { error: "Rating not found." };
+  if (published && (!data.share_ok || !data.comment)) {
+    return { error: "The learner didn't agree to share this comment, so it can't be published." };
+  }
+  const { error } = await db
+    .from("course_ratings")
+    .update({ is_published: published })
+    .eq("id", id);
+  if (error) return { error: error.message };
+  refreshSite();
+  revalidatePath("/admin/testimonials");
+  return { message: published ? "Published on the course page." : "Hidden from the course page." };
+}
+
+/** A real quote received outside the app, recorded with where it came from. */
+export async function saveManualTestimonialAction(input: unknown): Promise<AdminResult> {
+  const admin = await requireAdmin();
+  const parsed = manualTestimonialSchema.safeParse(input);
+  if (!parsed.success) return issue(parsed.error);
+  const { id, ...row } = parsed.data;
+  const db = createAdminClient();
+  const { error } = id
+    ? await db.from("testimonials").update(row).eq("id", id)
+    : await db.from("testimonials").insert({ ...row, created_by: admin.id });
+  if (error) return { error: error.message };
+  refreshSite();
+  revalidatePath("/admin/testimonials");
+  return { message: id ? "Testimonial saved." : "Testimonial added." };
+}
+
+export async function setManualTestimonialPublishedAction(
+  id: string,
+  published: boolean,
+): Promise<AdminResult> {
+  await requireAdmin();
+  if (!uuid.safeParse(id).success) return { error: "Invalid request." };
+  const { error } = await createAdminClient()
+    .from("testimonials")
+    .update({ is_published: published })
+    .eq("id", id);
+  if (error) return { error: error.message };
+  refreshSite();
+  revalidatePath("/admin/testimonials");
+  return { message: published ? "Published." : "Hidden." };
+}
+
+export async function deleteManualTestimonialAction(id: string): Promise<AdminResult> {
+  await requireAdmin();
+  if (!uuid.safeParse(id).success) return { error: "Invalid request." };
+  const { error } = await createAdminClient().from("testimonials").delete().eq("id", id);
+  if (error) return { error: error.message };
+  refreshSite();
+  revalidatePath("/admin/testimonials");
+  return { message: "Deleted." };
 }
