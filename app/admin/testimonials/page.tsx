@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import {
   deleteManualTestimonialAction,
+  refreshPublicPagesAction,
   setManualTestimonialPublishedAction,
   setRatingPublishedAction,
 } from "@/app/admin/actions";
@@ -56,6 +57,9 @@ export default async function AdminTestimonialsPage() {
     <>
       <AdminHeader
         title="Testimonials"
+        actions={
+          <ActionButton action={refreshPublicPagesAction}>Refresh public pages</ActionButton>
+        }
         description="Everything shown on course pages comes from real learners: shared rating comments, starred daily responses, and quotes you add here."
       />
       <ReportProblems problems={reportProblems()} />
