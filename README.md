@@ -264,5 +264,6 @@ tests/              Vitest unit tests
   Attribution is a first-touch `mfb_attr` cookie (30 days) copied to the profile on signup.
 - **Books**: courses are "inspired by" the books. Cards render the title and author as text; never
   upload an official publisher cover.
-- **Legal pages** (`/terms`, `/privacy`, `/refund-policy`) are placeholders marked on the page —
-  replace them with reviewed wording before launch.
+- **Legal pages** (`/terms`, `/privacy`, `/refund-policy`) are complete drafts (Ontario law, support
+  email in `SUPPORT_EMAIL`, date in `LEGAL_UPDATED`, both in `lib/utils.ts`). Have them reviewed
+  before launch.

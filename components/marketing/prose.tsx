@@ -19,14 +19,3 @@ export function Prose({
     </article>
   );
 }
-
-export function DraftNotice() {
-  return (
-    <p
-      role="note"
-      className="border-accent/40 bg-accent-soft text-accent-strong rounded-2xl border px-4 py-3 text-sm"
-    >
-      Placeholder text — replace with your final, lawyer-reviewed wording before launch.
-    </p>
-  );
-}

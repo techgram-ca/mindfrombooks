@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { Logo } from "@/components/shared/logo";
-import { INSTAGRAM_URL, TAGLINE } from "@/lib/utils";
+import { INSTAGRAM_URL, SUPPORT_EMAIL, TAGLINE } from "@/lib/utils";
 
 const groups = [
   {
@@ -58,6 +58,25 @@ export function SiteFooter() {
           © {new Date().getFullYear()} mindfrombooks. Prices are in US dollars. Courses are inspired
           by the books named and are not affiliated with, authorised or endorsed by their authors or
           publishers.
+        </p>
+        <p className="mt-2">
+          Questions?{" "}
+          <a
+            href={`mailto:${SUPPORT_EMAIL}`}
+            className="hover:text-foreground underline underline-offset-2"
+          >
+            {SUPPORT_EMAIL}
+          </a>
+          {" · "}
+          Developed by{" "}
+          <a
+            href="https://techgram.ca"
+            target="_blank"
+            rel="noopener"
+            className="hover:text-foreground font-medium underline underline-offset-2"
+          >
+            Techgram
+          </a>
         </p>
       </div>
     </footer>

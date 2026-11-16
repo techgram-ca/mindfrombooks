@@ -24,4 +24,7 @@ export function plural(n: number, one: string, many = `${one}s`): string {
 
 export const INSTAGRAM_URL = "https://www.instagram.com/mindfrombooks/";
 export const BRAND = "mindfrombooks";
+export const SUPPORT_EMAIL = "mindfrombooks22@gmail.com";
+/** Date shown on the Terms, Privacy and Refund pages. Update it when you change them. */
+export const LEGAL_UPDATED = "November 16, 2026";
 export const TAGLINE = "Books teach. Daily action changes you.";
