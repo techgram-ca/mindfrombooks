@@ -109,6 +109,28 @@ export default async function CoursePage({ params }: { params: Params }) {
 
       <div className="container-page grid gap-12 py-10 md:grid-cols-[1.25fr_0.75fr]">
         <div className="min-w-0 space-y-12">
+          {books.length > 0 && (
+            <section aria-labelledby="books-title">
+              <h2 id="books-title" className="text-2xl font-semibold">
+                Inspired by
+              </h2>
+              <div
+                className="-mx-5 mt-4 flex gap-3 overflow-x-auto px-5 pb-2"
+                tabIndex={0}
+                role="group"
+                aria-label="Books this course is inspired by"
+              >
+                {books.map((b) => (
+                  <BookCard key={b.id} book={b} color={course.accent_color} />
+                ))}
+              </div>
+              <p className="text-muted-foreground mt-3 text-sm">
+                Ideas are explained in our own words. This course is not affiliated with or endorsed
+                by the authors or publishers.
+              </p>
+            </section>
+          )}
+
           <section aria-labelledby="about-title">
             <h2 id="about-title" className="text-2xl font-semibold">
               What this course is
@@ -131,28 +153,6 @@ export default async function CoursePage({ params }: { params: Params }) {
                   </li>
                 ))}
               </ul>
-            </section>
-          )}
-
-          {books.length > 0 && (
-            <section aria-labelledby="books-title">
-              <h2 id="books-title" className="text-2xl font-semibold">
-                Inspired by
-              </h2>
-              <div
-                className="-mx-5 mt-4 flex gap-3 overflow-x-auto px-5 pb-2"
-                tabIndex={0}
-                role="group"
-                aria-label="Books this course is inspired by"
-              >
-                {books.map((b) => (
-                  <BookCard key={b.id} book={b} color={course.accent_color} />
-                ))}
-              </div>
-              <p className="text-muted-foreground mt-3 text-sm">
-                Ideas are explained in our own words. This course is not affiliated with or endorsed
-                by the authors or publishers.
-              </p>
             </section>
           )}
 

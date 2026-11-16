@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardBody } from "@/components/ui/card";
 import { CalendarGrid } from "@/components/dashboard/calendar-grid";
 import { ProgressBar } from "@/components/dashboard/progress-bar";
-import { RefundStatus } from "@/components/dashboard/refund-status";
+import { RefundPanel } from "@/components/dashboard/refund-panel";
 import { StartCourseButton } from "@/components/dashboard/start-course-button";
 import { requireUser } from "@/lib/auth";
 import { computeStreak, dateOfDay, formatDateLong } from "@/lib/course-days";
@@ -99,7 +99,7 @@ export default async function CourseProgressPage({
               </div>
             ))}
           </dl>
-          <RefundStatus view={view} />
+          <RefundPanel view={view} />
         </CardBody>
       </Card>
 
@@ -130,7 +130,7 @@ export default async function CourseProgressPage({
               <p className="mt-1 font-serif text-xl font-semibold">{todayContent.title}</p>
               <Button asChild className="mt-4">
                 <Link href={`${base}/day/${openDay}`}>
-                  {view.todayDone ? "View my response" : "Respond now"} <ArrowRight aria-hidden />
+                  {view.todayDone ? "View my response" : "Act now"} <ArrowRight aria-hidden />
                 </Link>
               </Button>
             </CardBody>

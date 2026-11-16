@@ -89,7 +89,7 @@ export function TodayCard({
             <div className="mt-4 flex flex-wrap items-center gap-3">
               <Button asChild>
                 <Link href={`${base}/day/${openDay}`}>
-                  Respond now <ArrowRight aria-hidden />
+                  Act now <ArrowRight aria-hidden />
                 </Link>
               </Button>
               {hoursLeft !== undefined && hoursLeft <= 3 && (
