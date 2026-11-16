@@ -551,3 +551,13 @@ export async function deleteManualTestimonialAction(id: string): Promise<AdminRe
   revalidatePath("/admin/testimonials");
   return { message: "Deleted." };
 }
+
+/**
+ * Public pages are cached for 5 minutes. Changes made directly in Supabase
+ * (SQL scripts, table edits) don't tell the app, so this refreshes them now.
+ */
+export async function refreshPublicPagesAction(): Promise<AdminResult> {
+  await requireAdmin();
+  refreshSite();
+  return { message: "Public pages refreshed. Reload a course page to see the latest content." };
+}

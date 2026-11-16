@@ -16,6 +16,9 @@ export async function GET() {
 
   const env = {
     NEXT_PUBLIC_SITE_URL: process.env.NEXT_PUBLIC_SITE_URL ?? null,
+    // Which deployment and which Supabase project this is (not secret).
+    vercel_env: process.env.VERCEL_ENV ?? "local",
+    supabase_project: SUPABASE_URL ? new URL(SUPABASE_URL).hostname.split(".")[0] : null,
     NEXT_PUBLIC_SUPABASE_URL: Boolean(SUPABASE_URL),
     NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: Boolean(SUPABASE_PUBLISHABLE_KEY),
     SUPABASE_SECRET_KEY: Boolean(supabaseSecretKey()),
