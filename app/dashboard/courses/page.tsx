@@ -1,12 +1,13 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { Plus } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ProgressBar } from "@/components/dashboard/progress-bar";
 import { StartCourseButton } from "@/components/dashboard/start-course-button";
+import { CourseCard } from "@/components/marketing/course-card";
 import { EmptyState } from "@/components/shared/empty-state";
 import { requireUser } from "@/lib/auth";
+import { getPublishedCourses } from "@/lib/queries/catalog";
 import { getLearnerState, type EnrollmentView } from "@/lib/queries/learning";
 
 export const metadata: Metadata = { title: "My courses" };
@@ -77,7 +78,9 @@ function List({ items, empty }: { items: EnrollmentView[]; empty: string }) {
 
 export default async function MyCoursesPage() {
   const profile = await requireUser("/dashboard/courses");
-  const { views } = await getLearnerState(profile);
+  const [{ views }, catalog] = await Promise.all([getLearnerState(profile), getPublishedCourses()]);
+  const owned = new Set(views.map((v) => v.course.id));
+  const more = catalog.filter((c) => !owned.has(c.id));
   const active = views.filter((v) => v.enrollment.status === "active");
   const completed = views.filter((v) => v.enrollment.status === "completed");
   const refunded = views.filter(
@@ -89,7 +92,7 @@ export default async function MyCoursesPage() {
       <h1 className="text-3xl font-semibold">My courses</h1>
       {views.length === 0 ? (
         <EmptyState emoji="📚" title="No courses yet">
-          Choose a course and Day 1 opens tomorrow morning.
+          Choose a course below and Day 1 opens tomorrow morning.
         </EmptyState>
       ) : (
         <Tabs defaultValue={active.length > 0 || completed.length === 0 ? "active" : "completed"}>
@@ -109,15 +112,18 @@ export default async function MyCoursesPage() {
           </TabsContent>
         </Tabs>
       )}
-      <Link
-        href="/courses"
-        className="rounded-card border-border text-accent-strong hover:bg-surface flex items-center gap-3 border border-dashed p-5 font-medium"
-      >
-        <span className="bg-accent-soft flex size-9 items-center justify-center rounded-full">
-          <Plus className="size-4" aria-hidden />
-        </span>
-        Browse more courses
-      </Link>
+      {more.length > 0 && (
+        <section aria-labelledby="explore-title" className="pt-4">
+          <h2 id="explore-title" className="text-xl font-semibold">
+            Explore more courses
+          </h2>
+          <div className="mt-3 grid gap-4 sm:grid-cols-2">
+            {more.map((course) => (
+              <CourseCard key={course.id} course={course} />
+            ))}
+          </div>
+        </section>
+      )}
     </div>
   );
 }

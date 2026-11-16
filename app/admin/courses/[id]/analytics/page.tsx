@@ -2,9 +2,9 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { DropoffChart, type DropoffPoint } from "@/components/admin/dropoff-chart";
-import { AdminHeader, Section, Stat, TableWrap, pct } from "@/components/admin/ui";
+import { AdminHeader, ReportProblems, Section, Stat, TableWrap, pct } from "@/components/admin/ui";
 import { Card, CardBody } from "@/components/ui/card";
-import { getCourseStats } from "@/lib/queries/admin";
+import { getCourseStats, noteReportProblem, reportProblems } from "@/lib/queries/admin";
 import { createAdminClient } from "@/lib/supabase/admin";
 import type { Course } from "@/lib/types";
 import { requireAdmin } from "@/lib/auth";
@@ -29,7 +29,7 @@ export default async function CourseAnalyticsPage({ params }: { params: Promise<
     db.rpc("admin_course_dropoff", { p_course_id: id }),
     getCourseStats(),
   ]);
-  if (error) throw new Error(error.message);
+  if (error) noteReportProblem("admin_course_dropoff", error.message);
   const rows = (data ?? []) as Row[];
   const points: DropoffPoint[] = rows.map((r) => ({
     day: r.day_number,
@@ -56,6 +56,7 @@ export default async function CourseAnalyticsPage({ params }: { params: Promise<
       <div className="mt-2">
         <AdminHeader title="Analytics" description={`${c.emoji} ${c.name} · ${c.days} days`} />
       </div>
+      <ReportProblems problems={reportProblems()} />
       <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
         <Stat
           label="Enrollments"

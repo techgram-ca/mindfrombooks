@@ -56,7 +56,7 @@ export function RefundButton({
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <Button variant="outline" size="sm">
-          Get my refund
+          Claim refund
         </Button>
       </DialogTrigger>
       <DialogContent>

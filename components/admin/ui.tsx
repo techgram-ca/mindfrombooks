@@ -78,3 +78,26 @@ export function fmtDate(iso: string | null | undefined): string {
     timeZone: "America/Toronto",
   }).format(new Date(iso));
 }
+
+/** Shown at the top of an admin page when a report query failed. */
+export function ReportProblems({ problems }: { problems: string[] }) {
+  if (problems.length === 0) return null;
+  return (
+    <div
+      role="alert"
+      className="rounded-card border-danger/30 bg-danger-soft mb-6 border p-4 text-sm"
+    >
+      <p className="text-danger font-semibold">Some numbers couldn&apos;t be loaded</p>
+      <ul className="text-foreground/80 mt-2 list-disc space-y-1 pl-5 font-mono text-xs break-words">
+        {problems.map((p) => (
+          <li key={p}>{p}</li>
+        ))}
+      </ul>
+      <p className="text-foreground/80 mt-3">
+        This usually means the last migration hasn&apos;t been run. In the Supabase SQL editor, run{" "}
+        <code>supabase/migrations/20261115000005_admin_stats.sql</code>, then run{" "}
+        <code>notify pgrst, &apos;reload schema&apos;;</code> and refresh this page.
+      </p>
+    </div>
+  );
+}

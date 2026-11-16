@@ -3,10 +3,8 @@ import { ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardBody } from "@/components/ui/card";
 import { TodayCard } from "@/components/dashboard/today-card";
-import { CourseCard } from "@/components/marketing/course-card";
 import { requireUser } from "@/lib/auth";
 import { closeInstant, greetingForHour, localHour } from "@/lib/course-days";
-import { getPublishedCourses } from "@/lib/queries/catalog";
 import { getDayContent, getLearnerState, type EnrollmentView } from "@/lib/queries/learning";
 
 function rank(view: EnrollmentView): number {
@@ -22,11 +20,7 @@ export default async function TodayPage({
   searchParams: Promise<{ enrolled?: string; welcome?: string }>;
 }) {
   const profile = await requireUser();
-  const [{ views, streak }, sp, catalog] = await Promise.all([
-    getLearnerState(profile),
-    searchParams,
-    getPublishedCourses(),
-  ]);
+  const [{ views, streak }, sp] = await Promise.all([getLearnerState(profile), searchParams]);
 
   const active = views
     .filter((v) => v.enrollment.status === "active" && v.phase !== "finished")
@@ -34,8 +28,6 @@ export default async function TodayPage({
   const finished = views.filter(
     (v) => v.enrollment.status === "completed" && v.progress.refundEligible,
   );
-  const owned = new Set(views.map((v) => v.course.id));
-  const more = catalog.filter((c) => !owned.has(c.id));
 
   const now = new Date();
   const contents = await Promise.all(
@@ -52,7 +44,7 @@ export default async function TodayPage({
           {greetingForHour(localHour(profile.timezone, now))}, {firstName} 👋
         </h1>
         <p className="text-muted-foreground mt-1">
-          {streak > 0 ? `🔥 ${streak}-day streak` : "Your streak starts with today's response."}
+          {streak > 0 ? `🔥 ${streak}-day streak` : "Your streak starts with today's action."}
           {pending > 0 && ` · ${pending} ${pending === 1 ? "task" : "tasks"} waiting`}
         </p>
       </header>
@@ -77,9 +69,13 @@ export default async function TodayPage({
                 {views.length === 0 ? "Pick your first course" : "Nothing running right now"}
               </h2>
               <p className="text-muted-foreground mx-auto mt-2 max-w-sm">
-                One small task a day. Choose what you want to change and Day 1 opens tomorrow
-                morning.
+                {views.length === 0
+                  ? "When you enroll, today's task shows up here each morning."
+                  : "No course is in progress. Your finished courses are under My courses."}
               </p>
+              <Button asChild className="mt-5">
+                <Link href="/dashboard/courses">Go to My courses</Link>
+              </Button>
             </CardBody>
           </Card>
         </section>
@@ -153,26 +149,6 @@ export default async function TodayPage({
               Inspired by {insight.book_reference}
             </p>
           )}
-        </section>
-      )}
-
-      {more.length > 0 && (
-        <section aria-labelledby="more-title">
-          <div className="mb-3 flex items-center justify-between">
-            <h2 id="more-title" className="text-xl font-semibold">
-              {views.length === 0 ? "Courses" : "Explore more courses"}
-            </h2>
-            <Button asChild variant="link" size="sm">
-              <Link href="/courses">
-                View all <ArrowRight aria-hidden />
-              </Link>
-            </Button>
-          </div>
-          <div className="grid gap-4 sm:grid-cols-2">
-            {(views.length === 0 ? more : more.slice(0, 2)).map((course) => (
-              <CourseCard key={course.id} course={course} />
-            ))}
-          </div>
         </section>
       )}
     </div>

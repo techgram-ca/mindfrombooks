@@ -1,10 +1,15 @@
 import Link from "next/link";
 import { ExternalLink } from "lucide-react";
 import { VisitorRate } from "@/components/admin/misc-forms";
-import { AdminHeader, Section, Stat, TableWrap, pct } from "@/components/admin/ui";
+import { AdminHeader, ReportProblems, Section, Stat, TableWrap, pct } from "@/components/admin/ui";
 import { Button } from "@/components/ui/button";
 import { formatUsd } from "@/lib/pricing";
-import { getAllCourses, getCourseStats } from "@/lib/queries/admin";
+import {
+  getAllCourses,
+  getCourseStats,
+  noteReportProblem,
+  reportProblems,
+} from "@/lib/queries/admin";
 import { createAdminClient } from "@/lib/supabase/admin";
 import type { Coupon } from "@/lib/types";
 import { requireAdmin } from "@/lib/auth";
@@ -48,8 +53,22 @@ export default async function AdminOverviewPage() {
       getCourseStats(),
     ],
   );
-  if (overviewRes.error) throw new Error(overviewRes.error.message);
-  const o = overviewRes.data as Overview;
+  if (overviewRes.error) noteReportProblem("admin_overview", overviewRes.error.message);
+  if (campaignsRes.error) noteReportProblem("admin_campaign_stats", campaignsRes.error.message);
+  if (couponStatsRes.error) noteReportProblem("admin_coupon_stats", couponStatsRes.error.message);
+  const o: Overview = (overviewRes.data as Overview | null) ?? {
+    signups_today: 0,
+    signups_7d: 0,
+    signups_30d: 0,
+    signups_total: 0,
+    buyers_total: 0,
+    buyers_30d: 0,
+    paid_enrollments: 0,
+    revenue_cents: 0,
+    refunds_cents: 0,
+    refund_count: 0,
+    active_today: 0,
+  };
   const campaigns = (campaignsRes.data ?? []) as CampaignRow[];
   const couponStats = new Map(
     ((couponStatsRes.data ?? []) as CouponStat[]).map((c) => [c.coupon_id, c]),
@@ -73,6 +92,7 @@ export default async function AdminOverviewPage() {
           </Button>
         }
       />
+      <ReportProblems problems={reportProblems()} />
 
       <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
         <Stat

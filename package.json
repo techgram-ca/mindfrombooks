@@ -11,7 +11,8 @@
     "test": "vitest run",
     "format": "prettier --write .",
     "seed": "tsx scripts/seed.ts",
-    "seed:sql": "tsx scripts/seed.ts --sql > supabase/seed.sql"
+    "seed:sql": "tsx scripts/seed.ts --sql > supabase/seed.sql",
+    "content:sql": "tsx scripts/seed.ts --content-sql > supabase/migrations/20261116000001_course_content.sql"
   },
   "dependencies": {
     "@radix-ui/react-dialog": "^1.3.1",

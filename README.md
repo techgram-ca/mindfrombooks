@@ -49,6 +49,9 @@ from the seed data so you can look at it. Sign-in, checkout and the dashboard ne
 
 1. Create a project at supabase.com.
 2. **SQL Editor** → run each file in `supabase/migrations/` in order (or `supabase db push` with the CLI).
+   The last file, `20261116000001_course_content.sql`, loads the full day-by-day content for all six
+   courses and sets grace days and sample days; run it after the seed on a database that was seeded
+   earlier (it is harmless on a fresh one).
 3. **Project Settings → API**: copy the project URL into `NEXT_PUBLIC_SUPABASE_URL`, the **publishable key** (`sb_publishable_…`) into `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` and the **secret key** (`sb_secret_…`) into `SUPABASE_SECRET_KEY`. (Older projects: the legacy `anon` and `service_role` keys work in the same two variables.)
 4. **Authentication → URL Configuration**: set _Site URL_ to your domain and add
    `https://YOUR-DOMAIN/auth/callback` (and `http://localhost:3000/auth/callback`) to _Redirect URLs_.
@@ -123,13 +126,32 @@ A learner gets at most one of the two daily emails per day.
 1. Log in as the admin → `/admin`.
 2. **Users → Create user & grant access** → the tester gets an email to set a password.
 3. As a normal user, open a course and enter `TEST100` → enrolled free, no Stripe.
-4. The course starts **tomorrow**. To test today, edit the enrollment's `start_date` in Supabase
-   (set it to today's date in the enrollment's timezone), then submit Day 1.
-5. Create a coupon that leaves a US$1 price (e.g. US$8.99 off Fix Your Money), set a course to
-   **3 days** in the admin, buy it with a real card, respond on all 3 days (or move `start_date`
-   back and add responses), then press **Get my refund** on the Purchases page.
+4. The course starts **tomorrow**. To test without waiting, open **Admin → Users → that user** and
+   use **Jump to day** on the enrollment: pick any day (or "Starts tomorrow" / "Finished
+   yesterday") and press Apply. "Mark earlier days as answered" fills the days before it with
+   test responses, so you can see the on-track and refund-eligible states; "Delete all responses"
+   resets the course.
+5. Create a coupon that leaves a US$1 price (e.g. US$8.99 off Fix Your Money), buy the course with
+   a real card, jump that enrollment to **Finished yesterday** with earlier days marked as answered,
+   then press **Claim refund** on the Purchases page.
 
 Setting a course to fewer days hides the later tasks but keeps their content, so you can set it back.
+
+---
+
+## Course content
+
+All 217 days are written in `scripts/content/`, one file per course. Every day cites the book its
+idea comes from, paraphrased in our own words. To change content for a live site, either edit it in
+the admin task editor, or edit the content files and regenerate the SQL:
+
+```bash
+npm run content:sql
+```
+
+That rewrites `supabase/migrations/20261116000001_course_content.sql`, which updates courses in
+place by slug. Grace days and public sample days follow course length: under 25 days → 2 and 2,
+25–50 days → 3 and 3, over 50 days → 4 grace days and 3 samples.
 
 ---
 

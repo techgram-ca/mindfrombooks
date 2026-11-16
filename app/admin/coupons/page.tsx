@@ -28,6 +28,7 @@ export default async function AdminCouponsPage() {
     getAllCourses(),
   ]);
   if (couponsRes.error) throw new Error(couponsRes.error.message);
+  if (statsRes.error) console.error("[admin report] admin_coupon_stats:", statsRes.error.message);
   const coupons = (couponsRes.data ?? []) as Coupon[];
   const stats = new Map(((statsRes.data ?? []) as CouponStat[]).map((s) => [s.coupon_id, s]));
   const courseOptions = courses.map((c) => ({ id: c.id, name: c.name }));

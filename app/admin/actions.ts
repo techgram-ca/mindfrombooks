@@ -1,7 +1,7 @@
 "use server";
 import { revalidatePath } from "next/cache";
 import { requireAdmin, HttpError } from "@/lib/auth";
-import { startDateForEnrollment } from "@/lib/course-days";
+import { addDays, startDateForEnrollment, todayInTz } from "@/lib/course-days";
 import { renderTemplate } from "@/lib/email";
 import { sendAdminInviteEmail } from "@/lib/emails";
 import { processRefund } from "@/lib/refund-service";
@@ -18,7 +18,7 @@ import {
   testimonialSchema,
 } from "@/lib/validators/admin";
 import { z } from "zod";
-import type { Course, Profile } from "@/lib/types";
+import type { Course, Enrollment, Profile } from "@/lib/types";
 
 export interface AdminResult {
   error?: string;
@@ -362,6 +362,82 @@ export async function restoreEnrollmentAction(enrollmentId: string): Promise<Adm
   if (!data?.length) return { error: "That enrollment isn't revoked." };
   revalidatePath(`/admin/users/${data[0].user_id as string}`);
   return { message: "Access restored." };
+}
+
+const setDaySchema = z.object({
+  enrollmentId: uuid,
+  day: z.coerce.number().int().min(0).max(367),
+  responses: z.enum(["keep", "fill", "clear"]),
+});
+
+/**
+ * Testing tool: move a learner to any day of a course by shifting the
+ * enrollment's start date. Day 0 = "starts tomorrow"; a day past the end =
+ * "finished yesterday". Optionally mark the earlier days as answered (to see
+ * the on-track / refund-eligible states) or clear every response.
+ */
+export async function setEnrollmentDayAction(input: unknown): Promise<AdminResult> {
+  await requireAdmin();
+  const parsed = setDaySchema.safeParse(input);
+  if (!parsed.success) return issue(parsed.error);
+  const { enrollmentId, responses } = parsed.data;
+  const db = createAdminClient();
+  const { data } = await db
+    .from("enrollments")
+    .select("*, courses(*)")
+    .eq("id", enrollmentId)
+    .maybeSingle();
+  const row = data as (Enrollment & { courses: Course }) | null;
+  if (!row) return { error: "Enrollment not found." };
+  if (row.status === "refunded" || row.status === "revoked") {
+    return { error: `This enrollment is ${row.status}, so its day can't be changed.` };
+  }
+  const total = row.courses.days;
+  const day = Math.min(parsed.data.day, total + 1);
+  const today = todayInTz(row.timezone);
+  const startDate = addDays(today, 1 - day); // day 0 → tomorrow, day 1 → today
+
+  const { error } = await db
+    .from("enrollments")
+    // Re-open it; if the course is now over, the usual completion step closes it again.
+    .update({ start_date: startDate, status: "active", completed_at: null })
+    .eq("id", row.id);
+  if (error) return { error: error.message };
+
+  if (responses === "clear") {
+    await db.from("responses").delete().eq("enrollment_id", row.id);
+    await db.from("certificates").delete().eq("enrollment_id", row.id);
+  } else if (responses === "fill" && day > 1) {
+    const upTo = Math.min(day - 1, total);
+    const { data: tasks } = await db
+      .from("tasks")
+      .select("id, day_number")
+      .eq("course_id", row.course_id)
+      .lte("day_number", upTo);
+    const taskOf = new Map((tasks ?? []).map((t) => [t.day_number as number, t.id as string]));
+    const rows = Array.from({ length: upTo }, (_, i) => ({
+      enrollment_id: row.id,
+      user_id: row.user_id,
+      task_id: taskOf.get(i + 1) ?? null,
+      day_number: i + 1,
+      body: "(Test response added from the admin portal.)",
+    }));
+    const { error: fillError } = await db
+      .from("responses")
+      .upsert(rows, { onConflict: "enrollment_id,day_number", ignoreDuplicates: true });
+    if (fillError)
+      return { error: `Day changed, but the test responses failed: ${fillError.message}` };
+  }
+
+  revalidatePath(`/admin/users/${row.user_id}`);
+  return {
+    message:
+      day === 0
+        ? `${row.courses.name} now starts tomorrow.`
+        : day > total
+          ? `${row.courses.name} now finished yesterday.`
+          : `${row.courses.name} is now on Day ${day} of ${total}.`,
+  };
 }
 
 /** Refund a paid enrollment regardless of the guarantee rules. */

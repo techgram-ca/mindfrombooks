@@ -3,7 +3,7 @@
  * local preview, CI build). Lets the public site render from the seed data so
  * you can look at it before connecting a database.
  */
-import { BUNDLE, COURSES } from "@/scripts/seed-data";
+import { BUNDLE, COURSES, courseAllowances } from "@/scripts/seed-data";
 import type { Bundle, Course, CourseBook, CoursePhase, Task } from "@/lib/types";
 
 export function demoCourses(): Course[] {
@@ -22,7 +22,7 @@ export function demoCourses(): Course[] {
     days: c.days,
     price_cents: c.price_cents,
     currency: "usd",
-    grace_days: 0,
+    grace_days: courseAllowances(c.days).graceDays,
     cover_image_url: null,
     status: "published",
     sort_order: i + 1,
@@ -67,7 +67,7 @@ export function demoTasks(slug: string): Task[] {
       instructions: real?.instructions ?? [],
       response_prompt: real?.response_prompt ?? "",
       min_response_chars: 0,
-      is_sample: Boolean(real),
+      is_sample: i < courseAllowances(c.days).sampleDays,
     };
   });
 }
