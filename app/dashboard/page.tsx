@@ -2,7 +2,7 @@ import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardBody } from "@/components/ui/card";
-import { TodayCard } from "@/components/dashboard/today-card";
+import { TodayCard, showsDashboardInsight } from "@/components/dashboard/today-card";
 import { requireUser } from "@/lib/auth";
 import { closeInstant, greetingForHour, localHour } from "@/lib/course-days";
 import { getDayContent, getLearnerState, type EnrollmentView } from "@/lib/queries/learning";
@@ -33,7 +33,6 @@ export default async function TodayPage({
   const contents = await Promise.all(
     active.map((v) => (v.openDay ? getDayContent(v, v.openDay) : Promise.resolve(null))),
   );
-  const insight = contents.find((c) => c?.task?.book_insight)?.task ?? null;
   const pending = active.filter((v) => v.phase === "in_progress" && !v.todayDone).length;
   const firstName = profile.name.trim().split(/\s+/)[0] || "there";
 
@@ -98,6 +97,14 @@ export default async function TodayPage({
                   key={view.enrollment.id}
                   view={view}
                   taskTitle={contents[i]?.title}
+                  insight={
+                    contents[i]?.task && showsDashboardInsight(view.course)
+                      ? {
+                          text: contents[i].task.book_insight,
+                          reference: contents[i].task.book_reference,
+                        }
+                      : undefined
+                  }
                   hoursLeft={close ? (close.getTime() - now.getTime()) / 3_600_000 : undefined}
                 />
               );
@@ -129,26 +136,6 @@ export default async function TodayPage({
               </Link>
             ))}
           </div>
-        </section>
-      )}
-
-      {insight && (
-        <section
-          aria-labelledby="insight-title"
-          className="rounded-card bg-primary text-primary-foreground p-5 sm:p-6"
-        >
-          <h2
-            id="insight-title"
-            className="text-accent font-sans text-xs font-semibold tracking-[0.14em] uppercase"
-          >
-            Book insight of the day
-          </h2>
-          <p className="mt-2 font-serif text-lg leading-relaxed">{insight.book_insight}</p>
-          {insight.book_reference && (
-            <p className="text-primary-foreground/70 mt-3 text-sm">
-              Inspired by {insight.book_reference}
-            </p>
-          )}
         </section>
       )}
     </div>
