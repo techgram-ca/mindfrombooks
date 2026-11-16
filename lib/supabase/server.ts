@@ -2,11 +2,13 @@ import "server-only";
 import { createServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
 import { SUPABASE_PUBLISHABLE_KEY, SUPABASE_URL } from "@/lib/supabase/env";
+import { freshFetch } from "@/lib/supabase/fresh-fetch";
 
 /** Supabase client bound to the visitor's session cookies. Subject to RLS. */
 export async function createClient() {
   const cookieStore = await cookies();
   return createServerClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {
+    global: { fetch: freshFetch },
     cookies: {
       getAll: () => cookieStore.getAll(),
       setAll: (toSet) => {

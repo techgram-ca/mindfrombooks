@@ -407,7 +407,7 @@ export function TestimonialControls({
       <Input
         aria-label="Display name for testimonial"
         className="h-9 w-48"
-        placeholder="e.g. Aman, Toronto"
+        placeholder="e.g. Aman, India"
         value={display}
         maxLength={80}
         onChange={(e) => setDisplay(e.target.value)}

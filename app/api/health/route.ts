@@ -45,11 +45,14 @@ export async function GET() {
   async function probe(key: string, table: string): Promise<string> {
     if (!SUPABASE_URL || !key) return "skipped (not configured)";
     try {
+      // Not a count-only (HEAD) request: those come back without the error body,
+      // which hides "table not found".
       const { error, count } = await createClient(SUPABASE_URL, key, {
         auth: { persistSession: false },
       })
         .from(table)
-        .select("*", { count: "exact", head: true });
+        .select("*", { count: "exact" })
+        .limit(1);
       return error ? `error: ${error.message}` : `ok (${count ?? 0} rows)`;
     } catch (err) {
       return `error: ${err instanceof Error ? err.message : "request failed"}`;
@@ -60,6 +63,8 @@ export async function GET() {
     publishable_key_reads_courses: await probe(SUPABASE_PUBLISHABLE_KEY, "courses"),
     secret_key_reads_profiles: await probe(supabaseSecretKey(), "profiles"),
     secret_key_reads_tasks: await probe(supabaseSecretKey(), "tasks"),
+    ratings_table: await probe(supabaseSecretKey(), "course_ratings"),
+    testimonials_table: await probe(supabaseSecretKey(), "testimonials"),
   };
   // Each migration file leaves a fingerprint; a missing function means that file wasn't run.
   const functions: Record<string, string> = {};
@@ -85,6 +90,10 @@ export async function GET() {
   }
 
   for (const [check, result] of Object.entries(database)) {
+    if (result.startsWith("error") && check.endsWith("_table")) {
+      problems.push(`${check}: missing — run migration …20261117000001_ratings_testimonials.sql`);
+      continue;
+    }
     if (result.startsWith("error")) problems.push(`${check}: ${result}`);
   }
   if (database.secret_key_reads_tasks === "ok (0 rows)")

@@ -3,6 +3,7 @@ import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Card, CardBody } from "@/components/ui/card";
+import { RatingForm, type ExistingRating } from "@/components/dashboard/rating-form";
 import { RefundStatus } from "@/components/dashboard/refund-status";
 import { ShareCertificate } from "@/components/dashboard/share-certificate";
 import { CourseCard } from "@/components/marketing/course-card";
@@ -12,6 +13,7 @@ import { ensureCertificate } from "@/lib/completion";
 import { getPublishedCourses } from "@/lib/queries/catalog";
 import { getCertificate } from "@/lib/queries/certificates";
 import { getLearnerState } from "@/lib/queries/learning";
+import { createAdminClient } from "@/lib/supabase/admin";
 
 export const metadata: Metadata = { title: "Course complete" };
 
@@ -34,6 +36,13 @@ export default async function CompletePage({ params }: { params: Promise<{ slug:
   const owned = new Set(views.map((v) => v.course.id));
   const next = (await getPublishedCourses()).filter((c) => !owned.has(c.id)).slice(0, 2);
   const { progress, course } = view;
+  const { data: ratingRow, error: ratingError } = await createAdminClient()
+    .from("course_ratings")
+    .select("stars, comment, share_ok, display_name, country, is_published")
+    .eq("enrollment_id", view.enrollment.id)
+    .maybeSingle();
+  if (ratingError) console.error("[complete] rating lookup:", ratingError.message);
+  const rating = (ratingRow as ExistingRating | null) ?? null;
 
   return (
     <div className="space-y-8">
@@ -60,6 +69,19 @@ export default async function CompletePage({ params }: { params: Promise<{ slug:
           A certificate needs at least one completed day, so there isn&apos;t one for this course.
         </p>
       )}
+
+      <Card>
+        <CardBody className="space-y-3">
+          <h2 className="text-xl font-semibold">Rate {course.name}</h2>
+          <RatingForm
+            key={rating ? `${rating.stars}-${rating.is_published}` : "new"}
+            enrollmentId={view.enrollment.id}
+            courseSlug={course.slug}
+            firstName={profile.name.trim().split(/\s+/)[0] ?? ""}
+            existing={rating}
+          />
+        </CardBody>
+      </Card>
 
       <Card>
         <CardBody className="space-y-3">

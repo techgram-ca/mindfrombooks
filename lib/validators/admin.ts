@@ -153,3 +153,22 @@ export const testimonialSchema = z.object({
 });
 
 export { timezoneSchema };
+
+export const manualTestimonialSchema = z.object({
+  id: z.string().uuid().optional(),
+  course_id: z
+    .string()
+    .transform((v) => v || null)
+    .pipe(z.string().uuid().nullable()),
+  name: text(60).min(1, "Add the person's name."),
+  country: text(60).transform((v) => v || null),
+  body: text(600).min(1, "Add the quote."),
+  stars: z
+    .union([z.literal(""), z.coerce.number().int().min(1).max(5)])
+    .transform((v) => (v === "" ? null : v)),
+  source_note: text(300).min(3, "Say where this quote came from (e.g. Instagram DM, 12 Nov)."),
+  permission_confirmed: z.literal(true, {
+    error: "Confirm this is a real quote you have permission to publish.",
+  }),
+  is_published: z.boolean(),
+});
