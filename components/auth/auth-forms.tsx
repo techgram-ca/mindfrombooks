@@ -46,10 +46,12 @@ export function LoginForm({
   next,
   linkError,
   googleEnabled = false,
+  defaultEmail,
 }: {
   next: string;
   linkError?: boolean;
   googleEnabled?: boolean;
+  defaultEmail?: string;
 }) {
   const [state, action] = useActionState(loginAction, initial);
   return (
@@ -71,7 +73,14 @@ export function LoginForm({
         <input type="hidden" name="next" value={next} />
         <div>
           <Label htmlFor="email">Email</Label>
-          <Input id="email" name="email" type="email" autoComplete="email" required />
+          <Input
+            id="email"
+            name="email"
+            type="email"
+            autoComplete="email"
+            required
+            defaultValue={defaultEmail}
+          />
         </div>
         <div>
           <div className="flex items-baseline justify-between">
