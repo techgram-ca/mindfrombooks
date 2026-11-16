@@ -55,8 +55,11 @@ from the seed data so you can look at it. Sign-in, checkout and the dashboard ne
 3. **Project Settings → API**: copy the project URL into `NEXT_PUBLIC_SUPABASE_URL`, the **publishable key** (`sb_publishable_…`) into `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` and the **secret key** (`sb_secret_…`) into `SUPABASE_SECRET_KEY`. (Older projects: the legacy `anon` and `service_role` keys work in the same two variables.)
 4. **Authentication → URL Configuration**: set _Site URL_ to your domain and add
    `https://YOUR-DOMAIN/auth/callback` (and `http://localhost:3000/auth/callback`) to _Redirect URLs_.
-5. **Authentication → Providers → Google**: enable it and paste a Google OAuth client ID and secret
-   (Google Cloud Console → Credentials; the authorised redirect URI is shown in the Supabase panel).
+5. **Authentication → Sign In / Providers → Google** (optional): switch it on and paste a Google OAuth
+   client ID and secret. Create them in Google Cloud Console → APIs & Services → Credentials →
+   OAuth client ID (type: Web application), and add the callback URL that Supabase shows on that
+   screen (`https://YOUR-PROJECT.supabase.co/auth/v1/callback`) as an authorised redirect URI.
+   Until Google is enabled, the app hides the "Continue with Google" button automatically.
 6. Recommended: **Authentication → Emails → SMTP** → use Resend's SMTP so confirmation and
    password-reset emails come from your domain.
 
