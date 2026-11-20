@@ -5,6 +5,8 @@ import { Check, Info, Lock } from "lucide-react";
 import { BookCard } from "@/components/marketing/book-card";
 import { EnrollPanel } from "@/components/marketing/enroll-panel";
 import { Faq } from "@/components/marketing/faq";
+import { OfferPage } from "@/components/offer/offer-page";
+import { getOffer } from "@/lib/offers";
 import { GuaranteeBanner } from "@/components/marketing/guarantee";
 import { CourseTestimonials } from "@/components/marketing/testimonials";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -52,6 +54,23 @@ export default async function CoursePage({ params }: { params: Params }) {
     getTestimonials(course.id, 8),
     getRatingSummary(course.id),
   ]);
+  const offer = getOffer(course.slug);
+  if (offer) {
+    return (
+      <OfferPage
+        course={course}
+        books={books}
+        phases={phases}
+        samples={samples}
+        outline={outline}
+        testimonials={testimonials}
+        ratingSummary={ratingSummary}
+        windowDays={settings.refund_window_days}
+        offer={offer}
+      />
+    );
+  }
+
   const sampleDays = new Set(samples.map((s) => s.day_number));
   const locked = outline.filter((o) => !sampleDays.has(o.day_number));
   const lockedPreview = locked.slice(0, 8);
