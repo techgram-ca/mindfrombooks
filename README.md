@@ -177,6 +177,16 @@ Needs migration `20261118000002_guest_checkout.sql` **before** deploying this co
 
 ---
 
+## Offer pages
+
+A course can have a long-form, conversion-focused sales page. Its copy lives in `lib/offers/`
+(one file per course, registered in `lib/offers/index.ts`); price, days, grace days, phases, sample
+days, books and testimonials still come from the database. `fix-your-money` has one; other courses
+use the standard page until an offer file is added for them. The compounding calculator's maths is
+in `lib/offers/compound.ts` and is unit-tested.
+
+---
+
 ## Ratings and testimonials
 
 - When a learner finishes a course, the completion page asks for a 1–5 star rating and an optional
