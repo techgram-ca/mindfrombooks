@@ -6,12 +6,100 @@ import { useSave } from "@/components/admin/use-save";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardBody } from "@/components/ui/card";
-import { FieldHint, Input, Label, Textarea } from "@/components/ui/input";
+import { FieldHint, Input, Label, Select, Textarea } from "@/components/ui/input";
 import { parseTaskImport, type ImportPreview } from "@/lib/task-import";
-import type { Task } from "@/lib/types";
+import type { LessonResource, Task } from "@/lib/types";
 import { cn } from "@/lib/utils";
 
-function TaskFields({ task, onSaved }: { task: Task; onSaved: () => void }) {
+function ResourcesEditor({
+  value,
+  onChange,
+}: {
+  value: LessonResource[];
+  onChange: (next: LessonResource[]) => void;
+}) {
+  const update = (i: number, patch: Partial<LessonResource>) =>
+    onChange(value.map((r, j) => (j === i ? { ...r, ...patch } : r)));
+  return (
+    <div className="space-y-3">
+      {value.map((r, i) => (
+        <div key={i} className="border-border space-y-2 rounded-xl border p-3">
+          <div className="flex flex-wrap gap-2">
+            <Select
+              aria-label="Block type"
+              className="h-9 w-36"
+              value={r.kind}
+              onChange={(e) => update(i, { kind: e.target.value as LessonResource["kind"] })}
+            >
+              <option value="prompt">Prompt</option>
+              <option value="command">Command</option>
+              <option value="link">Link</option>
+              <option value="note">Note</option>
+            </Select>
+            {r.kind === "command" && (
+              <Select
+                aria-label="Operating system"
+                className="h-9 w-36"
+                value={r.os ?? "all"}
+                onChange={(e) => update(i, { os: e.target.value as LessonResource["os"] })}
+              >
+                <option value="all">All systems</option>
+                <option value="windows">Windows</option>
+                <option value="mac">Mac</option>
+                <option value="linux">Linux</option>
+              </Select>
+            )}
+            <Input
+              aria-label="Label"
+              className="h-9 min-w-0 flex-1"
+              placeholder="Label, e.g. Setup prompt"
+              value={r.label}
+              onChange={(e) => update(i, { label: e.target.value })}
+            />
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              onClick={() => onChange(value.filter((_, j) => j !== i))}
+            >
+              Remove
+            </Button>
+          </div>
+          <Textarea
+            aria-label="Content"
+            rows={r.kind === "link" ? 1 : 4}
+            className="min-h-0 font-mono text-sm"
+            placeholder={r.kind === "link" ? "https://…" : "Text people will copy"}
+            value={r.content}
+            onChange={(e) => update(i, { content: e.target.value })}
+          />
+        </div>
+      ))}
+      <Button
+        type="button"
+        variant="outline"
+        size="sm"
+        onClick={() => onChange([...value, { kind: "prompt", label: "", content: "" }])}
+      >
+        Add a block
+      </Button>
+    </div>
+  );
+}
+
+function TaskFields({
+  task,
+  onSaved,
+  workshop,
+  videoId,
+}: {
+  task: Task;
+  onSaved: () => void;
+  workshop: boolean;
+  videoId: string;
+}) {
+  const [resources, setResources] = useState<LessonResource[]>(task.resources ?? []);
+  const [video, setVideo] = useState(videoId ? `https://youtu.be/${videoId}` : "");
   const { pending, error, save } = useSave();
   const [f, setF] = useState({
     title: task.title,
@@ -37,6 +125,9 @@ function TaskFields({ task, onSaved }: { task: Task; onSaved: () => void }) {
             saveTaskAction({
               ...f,
               id: task.id,
+              ...(workshop
+                ? { resources: resources.filter((r) => r.label.trim() && r.content.trim()), video }
+                : {}),
               instructions: f.instructions
                 .split("\n")
                 .map((s) => s.trim())
@@ -51,7 +142,9 @@ function TaskFields({ task, onSaved }: { task: Task; onSaved: () => void }) {
         <Input id={`${id}-title`} value={f.title} onChange={set("title")} required />
       </div>
       <div>
-        <Label htmlFor={`${id}-insight`}>Book insight</Label>
+        <Label htmlFor={`${id}-insight`}>
+          {workshop ? "Intro (why this lesson matters)" : "Book insight"}
+        </Label>
         <Textarea
           id={`${id}-insight`}
           rows={3}
@@ -59,10 +152,14 @@ function TaskFields({ task, onSaved }: { task: Task; onSaved: () => void }) {
           value={f.book_insight}
           onChange={set("book_insight")}
         />
-        <FieldHint>2–3 sentences in your own words. Never quote the book.</FieldHint>
+        <FieldHint>
+          {workshop
+            ? "2–3 sentences shown above the steps."
+            : "2–3 sentences in your own words. Never quote the book."}
+        </FieldHint>
       </div>
       <div>
-        <Label htmlFor={`${id}-ref`}>Book reference</Label>
+        <Label htmlFor={`${id}-ref`}>Book reference{workshop ? " (optional)" : ""}</Label>
         <Input
           id={`${id}-ref`}
           value={f.book_reference}
@@ -71,7 +168,7 @@ function TaskFields({ task, onSaved }: { task: Task; onSaved: () => void }) {
         />
       </div>
       <div>
-        <Label htmlFor={`${id}-steps`}>Instructions</Label>
+        <Label htmlFor={`${id}-steps`}>{workshop ? "Steps" : "Instructions"}</Label>
         <Textarea
           id={`${id}-steps`}
           rows={4}
@@ -81,28 +178,55 @@ function TaskFields({ task, onSaved }: { task: Task; onSaved: () => void }) {
         />
         <FieldHint>One bullet per line (2–5 works best).</FieldHint>
       </div>
-      <div>
-        <Label htmlFor={`${id}-prompt`}>Response prompt</Label>
-        <Textarea
-          id={`${id}-prompt`}
-          rows={2}
-          className="min-h-0"
-          value={f.response_prompt}
-          onChange={set("response_prompt")}
-        />
-      </div>
+      {!workshop && (
+        <>
+          <div>
+            <Label htmlFor={`${id}-prompt`}>Response prompt</Label>
+            <Textarea
+              id={`${id}-prompt`}
+              rows={2}
+              className="min-h-0"
+              value={f.response_prompt}
+              onChange={set("response_prompt")}
+            />
+          </div>
+        </>
+      )}
+      {workshop ? (
+        <>
+          <div>
+            <Label htmlFor={`${id}-video`}>Video (YouTube link)</Label>
+            <Input
+              id={`${id}-video`}
+              value={video}
+              onChange={(e) => setVideo(e.target.value)}
+              placeholder="https://youtu.be/… — upload as Unlisted on YouTube"
+            />
+            <FieldHint>
+              Upload the video to YouTube as Unlisted and paste its link. Learners never see the
+              link; leave empty for no video.
+            </FieldHint>
+          </div>
+          <div>
+            <p className="mb-1.5 text-sm font-medium">Prompts, commands, links and notes</p>
+            <ResourcesEditor value={resources} onChange={setResources} />
+          </div>
+        </>
+      ) : null}
       <div className="flex flex-wrap items-end gap-4">
-        <div>
-          <Label htmlFor={`${id}-min`}>Minimum characters</Label>
-          <Input
-            id={`${id}-min`}
-            type="number"
-            min={0}
-            className="w-32"
-            value={f.min_response_chars}
-            onChange={set("min_response_chars")}
-          />
-        </div>
+        {!workshop && (
+          <div>
+            <Label htmlFor={`${id}-min`}>Minimum characters</Label>
+            <Input
+              id={`${id}-min`}
+              type="number"
+              min={0}
+              className="w-32"
+              value={f.min_response_chars}
+              onChange={set("min_response_chars")}
+            />
+          </div>
+        )}
         <label className="flex h-11 items-center gap-2 text-sm font-medium">
           <input
             type="checkbox"
@@ -253,10 +377,16 @@ export function TaskEditor({
   courseId,
   days,
   tasks,
+  workshop = false,
+  videos = {},
 }: {
   courseId: string;
   days: number;
   tasks: Task[];
+  /** Self-paced workshop: lessons get a video and copy blocks. */
+  workshop?: boolean;
+  /** task id → YouTube id */
+  videos?: Record<string, string>;
 }) {
   const { pending, save } = useSave();
   const [order, setOrder] = useState(tasks.map((t) => t.id));
@@ -381,7 +511,14 @@ export function TaskEditor({
                   <ArrowDown />
                 </Button>
               </div>
-              {open === id && <TaskFields task={task} onSaved={() => setOpen(null)} />}
+              {open === id && (
+                <TaskFields
+                  task={task}
+                  onSaved={() => setOpen(null)}
+                  workshop={workshop}
+                  videoId={videos[task.id] ?? ""}
+                />
+              )}
             </li>
           );
         })}

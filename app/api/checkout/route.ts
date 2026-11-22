@@ -47,7 +47,9 @@ export const POST = handle(async (request: Request) => {
             ? "You're already enrolled in this course."
             : "You already have every course in this bundle.",
         url:
-          product.kind === "course" ? `/dashboard/courses/${product.slug}` : "/dashboard/courses",
+          product.kind === "course"
+            ? `/dashboard/${product.courses[0].format === "self_paced" ? "workshops" : "courses"}/${product.slug}`
+            : "/dashboard/courses",
       },
       { status: 409 },
     );
@@ -130,7 +132,7 @@ export const POST = handle(async (request: Request) => {
       free: true,
       url:
         product.kind === "course"
-          ? `/dashboard/courses/${product.slug}?enrolled=1`
+          ? `/dashboard/${product.courses[0].format === "self_paced" ? "workshops" : "courses"}/${product.slug}?enrolled=1`
           : "/dashboard?enrolled=1",
     });
   }

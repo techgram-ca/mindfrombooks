@@ -23,14 +23,14 @@ export function CourseCard({ course }: { course: Course }) {
           {course.emoji}
         </span>
         <span className="bg-surface-muted rounded-full px-3 py-1 text-sm font-semibold">
-          {course.days} days
+          {course.format === "self_paced" ? `${course.days} lessons` : `${course.days} days`}
         </span>
       </div>
       <h3 className="mt-4 text-xl font-semibold">{course.name}</h3>
       <p className="text-muted-foreground mt-1.5 text-[15px]">{course.short_description}</p>
       <p className="text-foreground/80 mt-3 text-sm">
         <span className="font-semibold" style={{ color: course.accent_color }}>
-          Why {course.days}?
+          {course.format === "self_paced" ? "Self-paced." : `Why ${course.days}?`}
         </span>{" "}
         {course.number_reason}
       </p>

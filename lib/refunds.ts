@@ -24,6 +24,10 @@ export interface ProgressInput {
   respondedDays: Iterable<number>;
   today: DateStr;
   refundWindowDays: number;
+  /** Self-paced workshops count ticked lessons; there are no days to miss. */
+  format?: "daily" | "self_paced";
+  /** False for courses sold without the refund guarantee. */
+  hasGuarantee?: boolean;
 }
 
 export interface Progress {
@@ -49,6 +53,7 @@ export function isPaidSource(source: EnrollmentSource, amountPaidCents: number):
 }
 
 export function computeProgress(input: ProgressInput): Progress {
+  if (input.format === "self_paced") return computeWorkshopProgress(input);
   const { startDate, today, totalDays, graceDays } = input;
   const responded = new Set([...input.respondedDays].filter((d) => d >= 1 && d <= totalDays));
   const currentDay = currentDayNumber(startDate, today, totalDays);
@@ -76,6 +81,8 @@ export function computeProgress(input: ProgressInput): Progress {
     reason = "Already refunded";
   } else if (input.status === "revoked") {
     reason = "Access revoked";
+  } else if (input.hasGuarantee === false) {
+    reason = "No refund guarantee on this course";
   } else if (!isPaid) {
     reason = "Free access";
   } else if (!startDate) {
@@ -105,10 +112,40 @@ export function computeProgress(input: ProgressInput): Progress {
     graceLeft: Math.max(0, graceDays - missed),
     isComplete,
     onTrackForRefund:
-      isPaid && input.status !== "refunded" && input.status !== "revoked" && missed <= graceDays,
+      isPaid &&
+      input.hasGuarantee !== false &&
+      input.status !== "refunded" &&
+      input.status !== "revoked" &&
+      missed <= graceDays,
     refundEligible: eligible,
     refundIneligibleReason: reason,
     refundDeadline,
+    isPaid,
+  };
+}
+
+/** Self-paced workshop: progress is lessons ticked; no missed days, no guarantee. */
+function computeWorkshopProgress(input: ProgressInput): Progress {
+  const done = new Set([...input.respondedDays].filter((d) => d >= 1 && d <= input.totalDays));
+  const isPaid = isPaidSource(input.source, input.amountPaidCents);
+  return {
+    currentDay: done.size,
+    totalDays: input.totalDays,
+    respondedCount: done.size,
+    missedDays: [],
+    remainingDays: input.totalDays - done.size,
+    graceDays: 0,
+    graceLeft: 0,
+    isComplete: done.size >= input.totalDays,
+    onTrackForRefund: false,
+    refundEligible: false,
+    refundIneligibleReason:
+      input.status === "refunded"
+        ? "Already refunded"
+        : input.status === "revoked"
+          ? "Access revoked"
+          : "No refund guarantee on this course",
+    refundDeadline: null,
     isPaid,
   };
 }

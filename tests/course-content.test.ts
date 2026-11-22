@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { COURSES, courseAllowances } from "@/scripts/seed-data";
+import { COURSES, WORKSHOPS, courseAllowances } from "@/scripts/seed-data";
 
 describe("course allowances by length", () => {
   it("gives 2 grace days and 2 samples under 25 days", () => {
@@ -63,4 +63,58 @@ describe("course content", () => {
       expect(covered).toEqual(Array.from({ length: c.days }, (_, i) => i + 1));
     },
   );
+});
+
+describe("workshops", () => {
+  it("are self-paced, have no guarantee and stay out of the daily list", () => {
+    for (const w of WORKSHOPS) {
+      expect(w.format).toBe("self_paced");
+      expect(w.hasGuarantee).toBe(false);
+      expect(COURSES.some((c) => c.slug === w.slug)).toBe(false);
+    }
+  });
+
+  it.each(WORKSHOPS.map((w) => [w.slug, w] as const))(
+    "%s has a complete lesson for every slot",
+    (_slug, w) => {
+      expect(w.tasks).toHaveLength(w.days);
+      expect(w.price_cents).toBe(699);
+      for (const [i, t] of w.tasks.entries()) {
+        const where = `${w.slug} lesson ${i + 1}`;
+        expect(t.title, where).not.toMatch(/coming soon/i);
+        expect(t.book_insight.length, where).toBeGreaterThan(80);
+        expect(t.instructions.length, where).toBeGreaterThanOrEqual(2);
+        for (const r of t.resources ?? []) {
+          expect(r.label.length, where).toBeGreaterThan(0);
+          expect(r.content.length, where).toBeGreaterThan(0);
+          expect(r.content.length, where).toBeLessThanOrEqual(8000);
+          if (r.kind === "link") expect(r.content, where).toMatch(/^https:\/\//);
+        }
+      }
+      const covered = w.phases.flatMap((p) =>
+        Array.from({ length: p.end_day - p.start_day + 1 }, (_, i) => p.start_day + i),
+      );
+      expect(covered).toEqual(Array.from({ length: w.days }, (_, i) => i + 1));
+    },
+  );
+
+  it("gives commands for Windows, Mac and Linux wherever they differ", () => {
+    for (const w of WORKSHOPS) {
+      for (const t of w.tasks) {
+        const osCommands = (t.resources ?? []).filter(
+          (r) => r.kind === "command" && r.os && r.os !== "all",
+        );
+        const systems = new Set(osCommands.map((r) => r.os));
+        // Linux-only install steps are allowed (desktop app covers Windows/Mac).
+        if (systems.size > 1)
+          expect([...systems].sort(), t.title).toEqual(["linux", "mac", "windows"]);
+      }
+    }
+  });
+
+  it("never puts a real ElevenLabs key in the course text", () => {
+    const text = JSON.stringify(WORKSHOPS);
+    expect(text).not.toMatch(/sk_[a-f0-9]{20,}/i);
+    expect(text).toContain("paste-your-key-here");
+  });
 });

@@ -71,6 +71,11 @@ export default async function RefundPolicyPage() {
       <h2>What isn&apos;t refundable</h2>
       <ul>
         <li>
+          Self-paced workshops marked “No refund guarantee” on their course page (for example the AI
+          animation workshop). Every lesson opens the moment you buy, so the guarantee doesn&apos;t
+          apply to them.
+        </li>
+        <li>
           Courses you received for free, including through a 100% discount code or as a gift from us
           — nothing was paid.
         </li>

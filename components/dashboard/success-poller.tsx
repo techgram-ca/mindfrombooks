@@ -11,6 +11,7 @@ type AccountStep = "signed_in" | "set_password" | "login";
 interface Status {
   ready: boolean;
   kind?: "course" | "bundle";
+  selfPaced?: boolean;
   name?: string;
   url?: string;
   amountCents?: number;
@@ -194,7 +195,9 @@ export function SuccessPoller({ sessionId }: { sessionId: string }) {
         <p className="text-muted-foreground mt-3 max-w-md text-lg">
           {isBundle
             ? "All Access is yours. Pick a course and tap Start — Day 1 opens the next morning."
-            : `${status.name} starts tomorrow. Day 1 opens at midnight your time, so you get the full day.`}
+            : status.selfPaced
+              ? `${status.name} is unlocked. Every lesson is open — start whenever you're ready.`
+              : `${status.name} starts tomorrow. Day 1 opens at midnight your time, so you get the full day.`}
         </p>
 
         {status.account === "set_password" && (
@@ -204,7 +207,11 @@ export function SuccessPoller({ sessionId }: { sessionId: string }) {
         {status.account === "signed_in" && (
           <Button asChild size="lg" className="mt-7">
             <Link href={status.url ?? "/dashboard"}>
-              {isBundle ? "Choose my first course" : "Go to my course"}
+              {isBundle
+                ? "Choose my first course"
+                : status.selfPaced
+                  ? "Open the workshop"
+                  : "Go to my course"}
             </Link>
           </Button>
         )}

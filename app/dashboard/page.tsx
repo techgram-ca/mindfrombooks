@@ -23,8 +23,14 @@ export default async function TodayPage({
   const [{ views, streak }, sp] = await Promise.all([getLearnerState(profile), searchParams]);
 
   const active = views
-    .filter((v) => v.enrollment.status === "active" && v.phase !== "finished")
+    .filter(
+      (v) => v.enrollment.status === "active" && v.phase !== "finished" && v.phase !== "workshop",
+    )
     .sort((a, b) => rank(a) - rank(b));
+  // Self-paced workshops: a "continue" card, never a daily task.
+  const workshops = views.filter(
+    (v) => v.phase === "workshop" && v.enrollment.status === "active" && !v.progress.isComplete,
+  );
   const finished = views.filter(
     (v) => v.enrollment.status === "completed" && v.progress.refundEligible,
   );
@@ -107,6 +113,44 @@ export default async function TodayPage({
                   }
                   hoursLeft={close ? (close.getTime() - now.getTime()) / 3_600_000 : undefined}
                 />
+              );
+            })}
+          </div>
+        </section>
+      )}
+
+      {workshops.length > 0 && (
+        <section aria-labelledby="workshops-title">
+          <h2
+            id="workshops-title"
+            className="text-muted-foreground mb-3 font-sans text-xs font-semibold tracking-[0.14em] uppercase"
+          >
+            Your workshops
+          </h2>
+          <div className="space-y-3">
+            {workshops.map((v) => {
+              const next =
+                Array.from({ length: v.course.days }, (_, i) => i + 1).find(
+                  (n) => !v.responded.has(n),
+                ) ?? 1;
+              return (
+                <Link
+                  key={v.enrollment.id}
+                  href={`/dashboard/workshops/${v.course.slug}/${next}`}
+                  className="rounded-card border-border bg-surface shadow-soft flex items-center justify-between gap-3 border p-4"
+                >
+                  <span>
+                    <span className="block font-medium">
+                      <span aria-hidden>{v.course.emoji} </span>
+                      {v.course.name}
+                    </span>
+                    <span className="text-muted-foreground text-sm">
+                      {v.progress.respondedCount} of {v.course.days} lessons done · continue with
+                      Lesson {next}
+                    </span>
+                  </span>
+                  <ArrowRight className="size-4 shrink-0" aria-hidden />
+                </Link>
               );
             })}
           </div>

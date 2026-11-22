@@ -24,6 +24,7 @@ export default async function CompletePage({ params }: { params: Promise<{ slug:
   const view = views.find((v) => v.course.slug === slug);
   if (!view) notFound();
   if (view.enrollment.status === "revoked") redirect("/dashboard/courses");
+  if (view.course.format === "self_paced") redirect(`/dashboard/workshops/${view.course.slug}`);
   // Only once the course is over for this learner.
   if (!view.progress.isComplete) redirect(`/dashboard/courses/${slug}`);
 

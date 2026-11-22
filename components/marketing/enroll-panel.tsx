@@ -15,6 +15,8 @@ interface Props {
   /** Small line under the button, e.g. the start-date promise. */
   note?: string;
   showStickyBar?: boolean;
+  /** False for courses sold without the refund guarantee. */
+  guarantee?: boolean;
 }
 
 interface Applied {
@@ -24,7 +26,13 @@ interface Applied {
 }
 
 /** Reads ?code= from the URL, so wrap it in <Suspense> on static pages. */
-export function EnrollPanel({ product, priceCents, note, showStickyBar = true }: Props) {
+export function EnrollPanel({
+  product,
+  priceCents,
+  note,
+  showStickyBar = true,
+  guarantee = true,
+}: Props) {
   const router = useRouter();
   const initialCode = useSearchParams().get("code")?.slice(0, 40) ?? "";
   const [code, setCode] = useState(initialCode.toUpperCase());
@@ -231,7 +239,9 @@ export function EnrollPanel({ product, priceCents, note, showStickyBar = true }:
             <div className="min-w-0 flex-1">
               <p className="truncate text-sm font-medium">{product.name}</p>
               <p className="text-muted-foreground text-sm">
-                {isFree ? "Free with your code" : `${formatUsd(finalCents)} · refund guarantee`}
+                {isFree
+                  ? "Free with your code"
+                  : `${formatUsd(finalCents)}${guarantee ? " · refund guarantee" : " · one-time"}`}
               </p>
             </div>
             <Button onClick={enroll} disabled={enrolling}>

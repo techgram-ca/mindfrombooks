@@ -42,6 +42,10 @@ export default async function GuaranteePage() {
       <h2>The fine print, in plain words</h2>
       <ul>
         <li>
+          <strong>Daily-action courses only.</strong> Self-paced workshops, which open in full the
+          moment you buy, are not covered. Their course page and checkout say so clearly.
+        </li>
+        <li>
           <strong>Every day counts.</strong> A day&apos;s task is only open on that day. If you miss
           it, it can&apos;t be redone, and the guarantee no longer applies to that course — unless
           the course allows some missed days.

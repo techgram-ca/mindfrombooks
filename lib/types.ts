@@ -2,6 +2,17 @@
 
 export type Role = "user" | "admin";
 export type CourseStatus = "draft" | "published" | "archived";
+/** daily: one task unlocks per day. self_paced: every lesson open at once (workshops). */
+export type CourseFormat = "daily" | "self_paced";
+
+/** A copy-able block on a lesson. */
+export interface LessonResource {
+  kind: "prompt" | "command" | "link" | "note";
+  label: string;
+  content: string;
+  /** For commands that differ by operating system. */
+  os?: "windows" | "mac" | "linux" | "all";
+}
 export type EnrollmentSource = "stripe" | "admin_grant" | "coupon_free" | "bundle";
 export type EnrollmentStatus = "active" | "completed" | "refunded" | "revoked";
 export type OrderStatus = "pending" | "paid" | "partially_refunded" | "refunded";
@@ -57,6 +68,8 @@ export interface Course {
   status: CourseStatus;
   sort_order: number;
   faq: FaqItem[];
+  format: CourseFormat;
+  has_guarantee: boolean;
   created_at: string;
 }
 
@@ -88,6 +101,8 @@ export interface Task {
   response_prompt: string;
   min_response_chars: number;
   is_sample: boolean;
+  /** Workshops only. */
+  resources?: LessonResource[];
 }
 
 export interface Bundle {
