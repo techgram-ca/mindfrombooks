@@ -58,7 +58,7 @@ function CopyBlock({ r }: { r: LessonResource }) {
       </div>
       <pre
         className={cn(
-          "max-h-96 overflow-auto px-4 py-3 text-[13px] leading-relaxed whitespace-pre-wrap",
+          "max-h-96 overflow-auto px-4 py-3 text-[13px] leading-relaxed whitespace-pre-wrap [overflow-wrap:anywhere]",
           isPrompt ? "bg-surface font-sans" : "bg-[#172033] font-mono text-[#e8eaf0]",
         )}
       >
