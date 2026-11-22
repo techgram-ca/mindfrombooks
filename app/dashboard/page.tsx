@@ -48,10 +48,12 @@ export default async function TodayPage({
         <h1 className="text-3xl font-semibold">
           {greetingForHour(localHour(profile.timezone, now))}, {firstName} 👋
         </h1>
-        <p className="text-muted-foreground mt-1">
-          {streak > 0 ? `🔥 ${streak}-day streak` : "Your streak starts with today's action."}
-          {pending > 0 && ` · ${pending} ${pending === 1 ? "task" : "tasks"} waiting`}
-        </p>
+        {(active.length > 0 || workshops.length === 0) && (
+          <p className="text-muted-foreground mt-1">
+            {streak > 0 ? `🔥 ${streak}-day streak` : "Your streak starts with today's action."}
+            {pending > 0 && ` · ${pending} ${pending === 1 ? "task" : "tasks"} waiting`}
+          </p>
+        )}
       </header>
 
       {sp.enrolled && (
@@ -63,7 +65,7 @@ export default async function TodayPage({
         </p>
       )}
 
-      {active.length === 0 ? (
+      {active.length === 0 && workshops.length > 0 ? null : active.length === 0 ? (
         <section aria-labelledby="empty-title">
           <Card>
             <CardBody className="text-center">

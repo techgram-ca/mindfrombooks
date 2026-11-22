@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import { ArrowRight, CheckCircle2, Circle, Info, MessageCircle, PlayCircle } from "lucide-react";
 import { ProgressBar } from "@/components/dashboard/progress-bar";
 import { Button } from "@/components/ui/button";
@@ -21,7 +21,8 @@ export default async function WorkshopOverviewPage({
   const { slug } = await params;
   const profile = await requireUser(`/dashboard/workshops/${slug}`);
   const view = await getWorkshopView(profile, slug);
-  if (!view) notFound();
+  // Not bought yet (or revoked): send them to the offer page.
+  if (!view) redirect(`/courses/${slug}`);
   const [lessons, sp] = await Promise.all([
     getLessons(view.course.id, view.course.days),
     searchParams,

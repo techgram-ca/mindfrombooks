@@ -187,9 +187,11 @@ export default async function AdminUserPage({ params }: { params: Promise<{ id: 
                   <td className="font-medium">
                     {e.courses.emoji} {e.courses.name}
                     <div className="text-muted-foreground font-normal">
-                      {e.start_date
-                        ? `Day 1 is ${e.start_date}`
-                        : "Not started — waiting for the learner to tap Start"}{" "}
+                      {e.courses.format === "self_paced"
+                        ? `Self-paced · bought ${fmtDate(e.created_at)}`
+                        : e.start_date
+                          ? `Day 1 is ${e.start_date}`
+                          : "Not started — waiting for the learner to tap Start"}{" "}
                       · {e.timezone}
                     </div>
                   </td>

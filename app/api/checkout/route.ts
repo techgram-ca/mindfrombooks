@@ -138,6 +138,7 @@ export const POST = handle(async (request: Request) => {
   }
 
   // ---- Paid: Stripe Checkout
+  const started = Date.now();
   const session = await getStripe().checkout.sessions.create({
     mode: "payment",
     // Logged in: we know the email. Guest: Stripe asks for it, and the account
@@ -152,7 +153,9 @@ export const POST = handle(async (request: Request) => {
           product_data: {
             name:
               product.kind === "course"
-                ? `${product.name} — ${product.courses[0].days}-day course`
+                ? product.courses[0].format === "self_paced"
+                  ? `${product.name} — self-paced workshop`
+                  : `${product.name} — ${product.courses[0].days}-day course`
                 : `${product.name} — all courses`,
           },
         },
@@ -179,6 +182,8 @@ export const POST = handle(async (request: Request) => {
       `${product.path}${body.code ? `?code=${encodeURIComponent(body.code)}` : ""}`,
     ),
   });
+  const ms = Date.now() - started;
+  if (ms > 3000) console.warn(`[checkout] Stripe session took ${ms} ms`);
   if (!session.url) throw new Error("Stripe did not return a checkout URL");
   return NextResponse.json({ url: session.url });
 });
