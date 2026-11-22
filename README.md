@@ -209,15 +209,16 @@ no days, no streak, no reminders, no refund guarantee unless you tick it. Learne
 **Workshops** tab in the dashboard (only when they own one), tick lessons off, copy prompts and
 commands (with Windows / Mac / Linux tabs) and watch explainer videos.
 
-The first one is **AI Animation Videos & Instagram Growth** (US$6.99, 14 lessons). Its lessons
+The first one is **AI Animation Videos & Instagram Growth** (US$6.99, 8 lessons — one explainer video each). Its lessons
 live in `scripts/content/ai-animation-instagram.ts`; regenerate its SQL with:
 
 ```bash
 npm run workshop:sql
 ```
 
-Run migrations `20261122000001_self_paced_workshops.sql` then
-`20261122000002_ai_animation_workshop.sql`.
+Run migrations `20261122000001_self_paced_workshops.sql`,
+`20261122000002_ai_animation_workshop.sql`, then `20261123000001_ai_animation_workshop_8_lessons.sql`
+(the latest; `npm run workshop:sql` rewrites this one).
 
 **Videos:** upload each explainer to YouTube as **Unlisted** (keep "Allow embedding" switched on
 so it can play on the lesson page), then paste the link into **Admin → Courses → (workshop) → Lessons**.

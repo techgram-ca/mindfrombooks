@@ -1,7 +1,7 @@
 import type { WorkshopOfferContent } from "./types";
 
 export const aiAnimationOffer: WorkshopOfferContent = {
-  eyebrow: "Self-paced workshop · 14 lessons · Windows, Mac & Linux",
+  eyebrow: "Self-paced workshop · 8 video lessons · Windows, Mac & Linux",
   headline: ["I grew @mindfrombooks to 35K", "in under a month.", "No video editor."],
   subhead:
     "Every Reel was made by describing it to Claude. This workshop sets up the same AI video studio on your computer and hands you the exact prompts and posting system.",
@@ -57,20 +57,20 @@ export const aiAnimationOffer: WorkshopOfferContent = {
   outcomes: [
     {
       title: "Set up your studio",
-      body: "Claude Code on your computer, every free video tool installed by one prompt, and your ElevenLabs voice connected. Lessons 1–5.",
+      body: "Claude Code on your computer, every free video tool installed by one prompt, and your ElevenLabs voice connected. Lessons 1–3.",
     },
     {
       title: "Make videos",
-      body: "Animated Reels inspired by styles you like, your own footage edited, voice and music added, and new styles on demand. Lessons 6–10.",
+      body: "Animated Reels inspired by styles you like, your own footage edited, voice and music added, and new styles on demand. Lessons 4–7.",
     },
     {
       title: "Grow on Instagram",
-      body: "Spot trends, post 3 a day at 9 am, 2 pm and 8 pm, read your numbers and double down on what works. Lessons 11–14.",
+      body: "Spot trends, post 3 a day at 9 am, 2 pm and 8 pm, read your numbers and double down on what works. Lesson 8.",
     },
   ],
   peek: {
-    lesson: 7,
-    label: "From Lesson 7 — your first animated video",
+    lesson: 4,
+    label: "From Lesson 4 — your first animated video",
     prompt: `Make a 20–30 second vertical Instagram Reel about: [YOUR IDEA].
 
 Style: inspired by references/style-notes.md — borrow the feel, not the exact design.
