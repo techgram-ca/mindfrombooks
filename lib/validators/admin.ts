@@ -32,6 +32,8 @@ export const courseSchema = z
     grace_days: z.coerce.number().int().min(0, "Grace days can't be negative.").max(365),
     cover_image_url: url,
     status: z.enum(["draft", "published", "archived"]),
+    format: z.enum(["daily", "self_paced"]).default("daily"),
+    has_guarantee: z.boolean().default(true),
     sort_order: z.coerce.number().int().min(0).max(9999),
     faq: z.array(z.object({ q: text(300).min(1), a: text(2000).min(1) })).max(30),
     books: z
@@ -48,7 +50,7 @@ export const courseSchema = z
       .max(12),
   })
   .superRefine((c, ctx) => {
-    if (c.grace_days >= c.days) {
+    if (c.format === "daily" && c.grace_days >= c.days) {
       ctx.addIssue({
         code: "custom",
         message: "Grace days must be fewer than the number of days.",
@@ -75,7 +77,20 @@ export const taskFieldsSchema = z.object({
   is_sample: z.coerce.boolean().default(false),
 });
 
-export const taskSchema = taskFieldsSchema.extend({ id: z.string().uuid() });
+export const lessonResourceSchema = z.object({
+  kind: z.enum(["prompt", "command", "link", "note"]),
+  label: text(120).min(1, "Every block needs a label."),
+  content: z.string().trim().min(1, "Every block needs content.").max(8000),
+  os: z.enum(["windows", "mac", "linux", "all"]).optional(),
+});
+
+export const taskSchema = taskFieldsSchema.extend({
+  id: z.string().uuid(),
+  /** Workshops: copy-able blocks. */
+  resources: z.array(lessonResourceSchema).max(20).optional(),
+  /** Workshops: a YouTube link or id. "" removes the video; undefined leaves it alone. */
+  video: z.string().trim().max(300).optional(),
+});
 export const importTaskSchema = taskFieldsSchema.extend({
   day_number: z.coerce.number().int().min(1).max(366),
 });

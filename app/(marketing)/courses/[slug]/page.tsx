@@ -6,7 +6,8 @@ import { BookCard } from "@/components/marketing/book-card";
 import { EnrollPanel } from "@/components/marketing/enroll-panel";
 import { Faq } from "@/components/marketing/faq";
 import { OfferPage } from "@/components/offer/offer-page";
-import { getOffer } from "@/lib/offers";
+import { WorkshopOfferPage } from "@/components/offer/workshop-offer-page";
+import { getOffer, getWorkshopOffer } from "@/lib/offers";
 import { GuaranteeBanner } from "@/components/marketing/guarantee";
 import { CourseTestimonials } from "@/components/marketing/testimonials";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -54,6 +55,19 @@ export default async function CoursePage({ params }: { params: Params }) {
     getTestimonials(course.id, 8),
     getRatingSummary(course.id),
   ]);
+  const workshopOffer = getWorkshopOffer(course.slug);
+  if (workshopOffer && course.format === "self_paced") {
+    return (
+      <WorkshopOfferPage
+        course={course}
+        phases={phases}
+        outline={outline}
+        testimonials={testimonials}
+        ratingSummary={ratingSummary}
+        offer={workshopOffer}
+      />
+    );
+  }
   const offer = getOffer(course.slug);
   if (offer) {
     return (

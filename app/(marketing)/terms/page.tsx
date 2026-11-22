@@ -99,7 +99,8 @@ export default async function TermsPage() {
         Our refund guarantee is set out in the <Link href="/refund-policy">Refund Policy</Link>. In
         short: if you paid for a course, responded on every day apart from the grace days that
         course allows, and are still not happy, you can get a full refund with one click within{" "}
-        {windowDays} days after your final day. The Refund Policy forms part of these terms.
+        {windowDays} days after your final day. Self-paced workshops marked “No refund guarantee” on
+        their page are not covered. The Refund Policy forms part of these terms.
       </p>
 
       <h2>7. Your responses and ratings</h2>

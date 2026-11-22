@@ -15,6 +15,8 @@ export const metadata: Metadata = { title: "My courses" };
 function statusLine(v: EnrollmentView): string {
   if (v.enrollment.status === "refunded") return "Refunded · journal is read-only";
   if (v.enrollment.status === "revoked") return "Access revoked";
+  if (v.phase === "workshop")
+    return `Self-paced workshop · ${v.progress.respondedCount} of ${v.course.days} lessons done`;
   if (v.phase === "not_started") return "Not started";
   if (v.phase === "starts_tomorrow") return "Starts tomorrow";
   if (v.phase === "finished")
@@ -50,7 +52,10 @@ function CourseRow({ v }: { v: EnrollmentView }) {
   return (
     <li className="rounded-card border-border bg-surface shadow-soft border p-5">
       {linkable ? (
-        <Link href={`/dashboard/courses/${v.course.slug}`} className="block">
+        <Link
+          href={`/dashboard/${v.phase === "workshop" ? "workshops" : "courses"}/${v.course.slug}`}
+          className="block"
+        >
           {body}
         </Link>
       ) : (

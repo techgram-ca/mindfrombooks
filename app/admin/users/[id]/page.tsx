@@ -55,6 +55,16 @@ export default async function AdminUserPage({ params }: { params: Promise<{ id: 
   const byEnrollment = new Map<string, number[]>();
   for (const r of responses)
     byEnrollment.set(r.enrollment_id, [...(byEnrollment.get(r.enrollment_id) ?? []), r.day_number]);
+  const { data: lessonRows } = await db
+    .from("lesson_progress")
+    .select("enrollment_id, lesson_number")
+    .eq("user_id", id);
+  const lessonsDone = new Map<string, number[]>();
+  for (const r of (lessonRows ?? []) as { enrollment_id: string; lesson_number: number }[])
+    lessonsDone.set(r.enrollment_id, [
+      ...(lessonsDone.get(r.enrollment_id) ?? []),
+      r.lesson_number,
+    ]);
   const courseOf = new Map(enrollments.map((e) => [e.id, e.courses]));
   const held = new Set(enrollments.map((e) => e.course_id));
 
@@ -161,10 +171,16 @@ export default async function AdminUserPage({ params }: { params: Promise<{ id: 
                 startDate: e.start_date,
                 graceDays: e.grace_days,
                 totalDays: e.courses.days,
-                respondedDays: byEnrollment.get(e.id) ?? [],
+                respondedDays:
+                  (e.courses.format === "self_paced"
+                    ? lessonsDone.get(e.id)
+                    : byEnrollment.get(e.id)) ?? [],
                 today: todayInTz(e.timezone),
                 refundWindowDays: settings.refund_window_days,
+                format: e.courses.format,
+                hasGuarantee: e.courses.has_guarantee,
               });
+              const workshop = e.courses.format === "self_paced";
               const paid = isPaidSource(e.source, e.amount_paid_cents);
               return (
                 <tr key={e.id}>
@@ -197,14 +213,18 @@ export default async function AdminUserPage({ params }: { params: Promise<{ id: 
                     </Badge>
                   </td>
                   <td>
-                    {!e.start_date
-                      ? "Not started"
-                      : p.currentDay === 0
-                        ? "Starts tomorrow"
-                        : `Day ${p.currentDay}/${e.courses.days}`}
-                    <div className="text-muted-foreground">
-                      {p.respondedCount} done · {p.missedDays.length} missed
-                    </div>
+                    {workshop
+                      ? `Workshop · ${p.respondedCount}/${e.courses.days} lessons`
+                      : !e.start_date
+                        ? "Not started"
+                        : p.currentDay === 0
+                          ? "Starts tomorrow"
+                          : `Day ${p.currentDay}/${e.courses.days}`}
+                    {!workshop && (
+                      <div className="text-muted-foreground">
+                        {p.respondedCount} done · {p.missedDays.length} missed
+                      </div>
+                    )}
                   </td>
                   <td>
                     {p.refundEligible ? (
@@ -215,7 +235,7 @@ export default async function AdminUserPage({ params }: { params: Promise<{ id: 
                     <div className="text-muted-foreground">Grace: {e.grace_days}</div>
                   </td>
                   <td>
-                    {(e.status === "active" || e.status === "completed") && (
+                    {!workshop && (e.status === "active" || e.status === "completed") && (
                       <div className="mb-3">
                         <SetDayForm
                           key={`${e.id}-${e.start_date}`}

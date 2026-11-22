@@ -31,7 +31,7 @@ export const POST = handle(async (request: Request) => {
 
   const { data: order } = await db
     .from("orders")
-    .select("id, user_id, created_account, account_claimed_at, created_at, courses(slug)")
+    .select("id, user_id, created_account, account_claimed_at, created_at, courses(slug, format)")
     .eq("stripe_checkout_session_id", body.sessionId)
     .maybeSingle();
   if (!order?.user_id || !order.created_account) {
@@ -73,10 +73,11 @@ export const POST = handle(async (request: Request) => {
   if (signInError)
     console.error("[claim] sign-in after setting password failed", signInError.message);
 
-  const course = order.courses as unknown as { slug: string } | null;
+  const course = order.courses as unknown as { slug: string; format?: string } | null;
+  const area = course?.format === "self_paced" ? "workshops" : "courses";
   return NextResponse.json({
     ok: true,
     signedIn: !signInError,
-    url: course ? `/dashboard/courses/${course.slug}?enrolled=1` : "/dashboard?enrolled=1",
+    url: course ? `/dashboard/${area}/${course.slug}?enrolled=1` : "/dashboard?enrolled=1",
   });
 });

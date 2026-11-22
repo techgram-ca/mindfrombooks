@@ -1,7 +1,7 @@
 import "server-only";
 import type Stripe from "stripe";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { startDateForEnrollment, safeTimezone } from "@/lib/course-days";
+import { startDateForEnrollment, safeTimezone, todayInTz } from "@/lib/course-days";
 import { splitAmount } from "@/lib/pricing";
 import { resolveProduct, type ResolvedProduct } from "@/lib/products";
 import { sendWelcomeEmail } from "@/lib/emails";
@@ -121,7 +121,12 @@ export async function fulfillPurchase(input: FulfillInput): Promise<FulfillResul
       coupon_id: input.couponId,
       // A single course always starts tomorrow. Bundle courses wait until the
       // learner taps "Start" on each one.
-      start_date: product.kind === "bundle" ? null : startDateForEnrollment(timezone),
+      start_date:
+        course.format === "self_paced"
+          ? todayInTz(timezone)
+          : product.kind === "bundle"
+            ? null
+            : startDateForEnrollment(timezone),
       timezone,
       grace_days: course.grace_days,
       utm_campaign: input.utmCampaign,
@@ -160,7 +165,14 @@ export async function fulfillPurchase(input: FulfillInput): Promise<FulfillResul
       isBundle: product.kind === "bundle",
       paid: !isFree,
       graceDays: product.kind === "course" ? product.courses[0].grace_days : 0,
-      path: product.kind === "course" ? `/dashboard/courses/${product.slug}` : "/dashboard",
+      selfPaced: product.kind === "course" && product.courses[0].format === "self_paced",
+      hasGuarantee: product.courses.every((c) => c.has_guarantee),
+      path:
+        product.kind === "course"
+          ? product.courses[0].format === "self_paced"
+            ? `/dashboard/workshops/${product.slug}`
+            : `/dashboard/courses/${product.slug}`
+          : "/dashboard",
       setPasswordUrl: input.createdAccount ? await setPasswordLink(profile.email) : null,
     });
   }

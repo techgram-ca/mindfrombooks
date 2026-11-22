@@ -32,7 +32,8 @@ async function loadActive(): Promise<Row[]> {
       .order("created_at")
       .range(from, from + 999);
     if (error) throw new Error(`could not load enrollments: ${error.message}`);
-    rows.push(...((data ?? []) as Row[]));
+    // Workshops have no days: no reminders, no automatic completion.
+    rows.push(...((data ?? []) as Row[]).filter((r) => r.courses?.format !== "self_paced"));
     if (!data || data.length < 1000) break;
   }
   return rows;

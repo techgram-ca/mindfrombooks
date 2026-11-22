@@ -12,7 +12,8 @@
     "format": "prettier --write .",
     "seed": "tsx scripts/seed.ts",
     "seed:sql": "tsx scripts/seed.ts --sql > supabase/seed.sql",
-    "content:sql": "tsx scripts/seed.ts --content-sql > supabase/migrations/20261116000001_course_content.sql"
+    "content:sql": "tsx scripts/seed.ts --content-sql > supabase/migrations/20261116000001_course_content.sql",
+    "workshop:sql": "tsx scripts/seed.ts --workshop-sql > supabase/migrations/20261122000002_ai_animation_workshop.sql"
   },
   "dependencies": {
     "@radix-ui/react-dialog": "^1.3.1",

@@ -37,7 +37,7 @@ export const GET = handle(async (request: Request) => {
     const { data: order } = await db
       .from("orders")
       .select(
-        "id, user_id, bundle_id, amount_total_cents, status, created_account, account_claimed_at, created_at, courses(slug, name)",
+        "id, user_id, bundle_id, amount_total_cents, status, created_account, account_claimed_at, created_at, courses(slug, name, format)",
       )
       .eq("stripe_checkout_session_id", sessionId)
       .maybeSingle();
@@ -49,8 +49,15 @@ export const GET = handle(async (request: Request) => {
     const alreadyOwned = (count ?? 0) === 0 && order.status === "refunded";
     if (!count && !alreadyOwned) return null;
 
-    const course = order.courses as unknown as { slug: string; name: string } | null;
-    const url = course ? `/dashboard/courses/${course.slug}` : "/dashboard";
+    const course = order.courses as unknown as {
+      slug: string;
+      name: string;
+      format?: string;
+    } | null;
+    const selfPaced = course?.format === "self_paced";
+    const url = course
+      ? `/dashboard/${selfPaced ? "workshops" : "courses"}/${course.slug}`
+      : "/dashboard";
     const { data: buyer } = await db
       .from("profiles")
       .select("email, name")
@@ -70,6 +77,7 @@ export const GET = handle(async (request: Request) => {
     return {
       ready: true,
       kind: order.bundle_id ? "bundle" : "course",
+      selfPaced,
       name: course?.name ?? "All Access",
       amountCents: order.amount_total_cents as number,
       url,

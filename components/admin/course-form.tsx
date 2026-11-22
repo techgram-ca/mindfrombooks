@@ -54,6 +54,7 @@ export function CourseForm({
     notice: course?.notice ?? "",
     days: String(course?.days ?? 21),
     price_dollars: course ? (course.price_cents / 100).toFixed(2) : "9.99",
+    format: course?.format ?? "daily",
     grace_days: String(course?.grace_days ?? 0),
     cover_image_url: course?.cover_image_url ?? "",
     status: course?.status ?? "draft",
@@ -70,6 +71,8 @@ export function CourseForm({
     })),
   );
   const [faq, setFaq] = useState<FaqItem[]>(course?.faq ?? []);
+  const [hasGuarantee, setHasGuarantee] = useState(course?.has_guarantee ?? true);
+  const workshop = f.format === "self_paced";
 
   const set =
     (key: keyof typeof f) =>
@@ -88,6 +91,7 @@ export function CourseForm({
         saveCourseAction({
           ...f,
           id: course?.id,
+          has_guarantee: hasGuarantee,
           outcomes: f.outcomes
             .split("\n")
             .map((s) => s.trim())
@@ -194,6 +198,30 @@ export function CourseForm({
               <option value="published">Published</option>
               <option value="archived">Archived (hidden, learners keep access)</option>
             </Select>
+          </div>
+          <div>
+            <Label htmlFor="format">Course type</Label>
+            <Select id="format" value={f.format} onChange={set("format")}>
+              <option value="daily">Daily — one task unlocks each day</option>
+              <option value="self_paced">Workshop — every lesson open at once</option>
+            </Select>
+            <FieldHint>
+              {workshop
+                ? "Days = number of lessons. No daily reminders, no missed days, no grace days."
+                : "Days unlock one by one in each learner's timezone."}
+            </FieldHint>
+          </div>
+          <div className="flex items-center gap-2.5 pt-7">
+            <input
+              id="guarantee"
+              type="checkbox"
+              className="size-4"
+              checked={hasGuarantee}
+              onChange={(e) => setHasGuarantee(e.target.checked)}
+            />
+            <Label htmlFor="guarantee" className="mb-0">
+              Offer the refund guarantee
+            </Label>
           </div>
           <div>
             <Label htmlFor="sort">Sort order</Label>

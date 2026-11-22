@@ -21,6 +21,9 @@ export function sendWelcomeEmail(input: {
   paid: boolean;
   graceDays: number;
   path: string;
+  /** Self-paced workshop: everything is open now. */
+  selfPaced?: boolean;
+  hasGuarantee?: boolean;
   /** Set for an account created by this purchase: a link to choose a password. */
   setPasswordUrl?: string | null;
 }) {
@@ -36,12 +39,22 @@ export function sendWelcomeEmail(input: {
       name: firstName(input.user.name),
       course_name: input.productName,
       days: input.days,
-      start_line: input.isBundle
-        ? "You choose when each course starts — tap Start on your dashboard and Day 1 opens the next morning."
-        : "Day 1 opens tomorrow morning, at midnight your time.",
-      guarantee_line: input.paid
-        ? `Remember the guarantee: ${rule}, and if you're not happy at the end you get a one-click refund.`
-        : "Show up every day — it's the only rule.",
+      course_line: input.selfPaced
+        ? `${input.days} lessons, at your own pace.`
+        : `${input.days} days, one small action a day.`,
+      start_line: input.selfPaced
+        ? "**Everything is unlocked.** Start with Lesson 1 whenever you're ready."
+        : `**${
+            input.isBundle
+              ? "You choose when each course starts — tap Start on your dashboard and Day 1 opens the next morning."
+              : "Day 1 opens tomorrow morning, at midnight your time."
+          }** Each day you get one task and answer one question. A day's task closes at 11:59 pm your time, so try to do it early.`,
+      guarantee_line:
+        input.hasGuarantee === false
+          ? "If you get stuck on a step, message @mindfrombooks on Instagram."
+          : input.paid
+            ? `Remember the guarantee: ${rule}, and if you're not happy at the end you get a one-click refund.`
+            : "Show up every day — it's the only rule.",
       account_line: input.setPasswordUrl
         ? `We created your account with this email. [Choose your password](${input.setPasswordUrl}) so you can log in on any device.`
         : "",

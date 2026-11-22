@@ -1,23 +1,43 @@
 "use client";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { BookOpen, Home, Receipt, Settings, Shield } from "lucide-react";
+import { BookOpen, Clapperboard, Home, Receipt, Settings, Shield } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-const items = [
+const baseItems = [
   { href: "/dashboard", label: "Today", icon: Home, exact: true },
-  { href: "/dashboard/courses", label: "My courses", icon: BookOpen },
-  { href: "/dashboard/purchases", label: "Purchases", icon: Receipt },
-  { href: "/dashboard/settings", label: "Settings", icon: Settings },
+  { href: "/dashboard/courses", label: "My courses", icon: BookOpen, exact: false },
+  { href: "/dashboard/purchases", label: "Purchases", icon: Receipt, exact: false },
+  { href: "/dashboard/settings", label: "Settings", icon: Settings, exact: false },
 ];
+const workshopsItem = {
+  href: "/dashboard/workshops",
+  label: "Workshops",
+  icon: Clapperboard,
+  exact: false,
+};
+
+/** The Workshops tab only appears for people who own a self-paced workshop. */
+function navItems(showWorkshops: boolean) {
+  return showWorkshops
+    ? [baseItems[0], baseItems[1], workshopsItem, baseItems[2], baseItems[3]]
+    : baseItems;
+}
 
 function useActive() {
   const pathname = usePathname();
   return (href: string, exact?: boolean) => (exact ? pathname === href : pathname.startsWith(href));
 }
 
-export function SidebarNav({ isAdmin }: { isAdmin: boolean }) {
+export function SidebarNav({
+  isAdmin,
+  showWorkshops = false,
+}: {
+  isAdmin: boolean;
+  showWorkshops?: boolean;
+}) {
   const isActive = useActive();
+  const items = navItems(showWorkshops);
   return (
     <nav aria-label="Dashboard" className="space-y-1">
       {items.map(({ href, label, icon: Icon, exact }) => (
@@ -49,12 +69,16 @@ export function SidebarNav({ isAdmin }: { isAdmin: boolean }) {
   );
 }
 
-export function BottomNav() {
+export function BottomNav({ showWorkshops = false }: { showWorkshops?: boolean }) {
+  const items = navItems(showWorkshops);
   const isActive = useActive();
   return (
     <nav
       aria-label="Dashboard"
-      className="border-border bg-surface/95 pb-safe fixed inset-x-0 bottom-0 z-40 grid grid-cols-4 border-t backdrop-blur md:hidden"
+      className={cn(
+        "border-border bg-surface/95 pb-safe fixed inset-x-0 bottom-0 z-40 grid border-t backdrop-blur md:hidden",
+        showWorkshops ? "grid-cols-5" : "grid-cols-4",
+      )}
     >
       {items.map(({ href, label, icon: Icon, exact }) => (
         <Link

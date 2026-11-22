@@ -170,3 +170,44 @@ describe("progress numbers", () => {
     expect(progress({ today: "2026-06-13", respondedDays: [1, 2, 3] }).remainingDays).toBe(7);
   });
 });
+
+describe("courses without the guarantee", () => {
+  it("are never refund-eligible, even when every day was done", () => {
+    const p = progress({ hasGuarantee: false });
+    expect(p.refundEligible).toBe(false);
+    expect(p.onTrackForRefund).toBe(false);
+    expect(p.refundIneligibleReason).toBe("No refund guarantee on this course");
+  });
+});
+
+describe("self-paced workshops", () => {
+  const workshop = (respondedDays: number[], status: ProgressInput["status"] = "active") =>
+    computeProgress({
+      status,
+      source: "stripe",
+      amountPaidCents: 699,
+      startDate: "2026-06-11",
+      graceDays: 0,
+      totalDays: 14,
+      respondedDays,
+      today: "2026-09-01",
+      refundWindowDays: 14,
+      format: "self_paced",
+      hasGuarantee: false,
+    });
+
+  it("count ticked lessons and never miss days", () => {
+    const p = workshop([1, 2, 5]);
+    expect(p.respondedCount).toBe(3);
+    expect(p.missedDays).toEqual([]);
+    expect(p.remainingDays).toBe(11);
+    expect(p.isComplete).toBe(false);
+  });
+  it("are complete when every lesson is ticked", () => {
+    expect(workshop(range(1, 14)).isComplete).toBe(true);
+  });
+  it("are never refund-eligible", () => {
+    expect(workshop(range(1, 14)).refundEligible).toBe(false);
+    expect(workshop([], "refunded").refundIneligibleReason).toBe("Already refunded");
+  });
+});

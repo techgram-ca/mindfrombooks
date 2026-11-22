@@ -14,6 +14,7 @@ export default async function JournalPage({ params }: { params: Promise<{ slug: 
   const view = await getEnrollmentView(profile, slug);
   if (!view) notFound();
   if (view.enrollment.status === "revoked") redirect("/dashboard/courses");
+  if (view.course.format === "self_paced") redirect(`/dashboard/workshops/${view.course.slug}`);
   const entries = await getJournal(view);
 
   return (

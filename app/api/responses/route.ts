@@ -33,6 +33,9 @@ export const POST = handle(async (request: Request) => {
     return jsonError(409, "This course is closed, so responses can't be changed any more.");
   }
   const course = enrollment.courses;
+  if (course.format === "self_paced") {
+    return jsonError(409, "This is a self-paced workshop — mark lessons as done instead.");
+  }
 
   const today = todayInTz(enrollment.timezone);
   const day = openDayNumber(enrollment.start_date, today, course.days);
