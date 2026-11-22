@@ -62,6 +62,8 @@ export interface Course {
   notice: string | null;
   days: number;
   price_cents: number;
+  /** Actual price before discount; shown struck through when above price_cents. */
+  list_price_cents?: number | null;
   currency: string;
   grace_days: number;
   cover_image_url: string | null;

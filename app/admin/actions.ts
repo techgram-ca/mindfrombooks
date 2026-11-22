@@ -45,13 +45,18 @@ export async function saveCourseAction(input: unknown): Promise<AdminResult> {
   await requireAdmin();
   const parsed = courseSchema.safeParse(input);
   if (!parsed.success) return issue(parsed.error);
-  const { id, books, phases, price_dollars, ...fields } = parsed.data;
+  const { id, books, phases, price_dollars, list_price_dollars, ...fields } = parsed.data;
+  const price_cents = Math.round(price_dollars * 100);
+  const list_price_cents = list_price_dollars == null ? null : Math.round(list_price_dollars * 100);
+  if (list_price_cents != null && list_price_cents <= price_cents)
+    return { error: "The actual price must be higher than the selling price (or left empty)." };
   const db = createAdminClient();
   const row = {
     ...fields,
     // Workshops have no days to miss.
     grace_days: fields.format === "self_paced" ? 0 : fields.grace_days,
-    price_cents: Math.round(price_dollars * 100),
+    price_cents,
+    list_price_cents,
     currency: "usd",
   };
 

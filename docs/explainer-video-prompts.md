@@ -16,18 +16,18 @@ workshop's explainer videos — the same way the course teaches.
 - When a video is ready, upload it to YouTube as **Unlisted**, then paste its link into the lesson
   in **Admin → Courses → AI Animation Videos & Instagram Growth → Lessons**.
 
-| #   | Video                                       | Goes on lesson(s) | Length   |
-| --- | ------------------------------------------- | ----------------- | -------- |
-| 1   | Welcome, Claude Pro, chat vs Code           | 1, 2              | ~3 min   |
-| 2   | Studio folder, local mode, one-prompt setup | 3, 4              | ~3 min   |
-| 3   | ElevenLabs key on Windows, Mac and Linux    | 5                 | ~2.5 min |
-| 4   | References and your first animation         | 6, 7              | ~3.5 min |
-| 5   | Editing your own footage                    | 8                 | ~2 min   |
-| 6   | Voiceover, free sound, export checklist     | 9                 | ~3 min   |
-| 7   | Inventing new styles                        | 10                | ~2 min   |
-| 8   | Growing on Instagram                        | 11–14             | ~4 min   |
+| #   | Video                                       | Lesson | Length   |
+| --- | ------------------------------------------- | ------ | -------- |
+| 1   | Welcome, Claude Pro, chat vs Code           | 1      | ~3 min   |
+| 2   | Studio folder, local mode, one-prompt setup | 2      | ~3 min   |
+| 3   | ElevenLabs key on Windows, Mac and Linux    | 3      | ~2.5 min |
+| 4   | References and your first animation         | 4      | ~3.5 min |
+| 5   | Editing your own footage                    | 5      | ~2 min   |
+| 6   | Voiceover, free sound, export checklist     | 6      | ~3 min   |
+| 7   | Inventing new styles                        | 7      | ~2 min   |
+| 8   | Growing on Instagram                        | 8      | ~4 min   |
 
-For a lesson that shares a video (for example 1 and 2), paste the same YouTube link into both.
+One video per lesson: video 1 goes on Lesson 1, video 2 on Lesson 2, and so on.
 
 ---
 

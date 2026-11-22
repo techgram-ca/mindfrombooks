@@ -13,6 +13,7 @@ import {
   X,
 } from "lucide-react";
 import { CompoundCalculator } from "@/components/offer/compound-calculator";
+import { PriceTag } from "@/components/marketing/price-tag";
 import { EnrollPanel } from "@/components/marketing/enroll-panel";
 import { Faq } from "@/components/marketing/faq";
 import { CourseTestimonials } from "@/components/marketing/testimonials";
@@ -149,6 +150,7 @@ export function OfferPage({
                 <EnrollPanel
                   product={{ kind: "course", id: course.id, slug: course.slug, name: course.name }}
                   priceCents={course.price_cents}
+                  listPriceCents={course.list_price_cents}
                   note="Day 1 opens tomorrow morning. No account needed to pay."
                 />
               </Suspense>
@@ -573,7 +575,7 @@ export function OfferPage({
             <p className="mt-3 font-serif text-2xl font-semibold">{offer.valueLine.title}</p>
             <p className="text-foreground/80 mt-2 leading-relaxed">{offer.valueLine.body}</p>
             <p className="mt-5 font-serif text-4xl font-semibold">
-              {formatUsd(course.price_cents)}{" "}
+              <PriceTag priceCents={course.price_cents} listPriceCents={course.list_price_cents} />{" "}
               <span className="text-muted-foreground font-sans text-base font-normal">once</span>
             </p>
             <p className="text-muted-foreground text-sm">

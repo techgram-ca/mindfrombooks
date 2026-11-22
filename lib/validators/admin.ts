@@ -29,6 +29,10 @@ export const courseSchema = z
     notice: text(500).transform((v) => v || null),
     days: z.coerce.number().int().min(1, "A course needs at least 1 day.").max(366),
     price_dollars: z.coerce.number().min(0, "Price can't be negative.").max(10000),
+    list_price_dollars: z
+      .union([z.literal(""), z.coerce.number().min(0, "Price can't be negative.").max(10000)])
+      .optional()
+      .transform((v) => (v === "" || v == null || v === 0 ? null : v)),
     grace_days: z.coerce.number().int().min(0, "Grace days can't be negative.").max(365),
     cover_image_url: url,
     status: z.enum(["draft", "published", "archived"]),

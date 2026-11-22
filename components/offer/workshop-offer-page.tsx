@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import type { WorkshopOfferContent } from "@/lib/offers";
 import type { OutlineItem, RatingSummary, Testimonial } from "@/lib/queries/catalog";
-import { formatUsd } from "@/lib/pricing";
+import { formatUsd, percentOff } from "@/lib/pricing";
 import type { Course, CoursePhase } from "@/lib/types";
 
 interface Props {
@@ -118,6 +118,7 @@ export function WorkshopOfferPage({
                 <EnrollPanel
                   product={{ kind: "course", id: course.id, slug: course.slug, name: course.name }}
                   priceCents={course.price_cents}
+                  listPriceCents={course.list_price_cents}
                   note="Every lesson unlocks the moment you pay. No account needed to pay."
                   guarantee={course.has_guarantee}
                 />
@@ -360,6 +361,8 @@ export function WorkshopOfferPage({
             </Link>
           </Button>
           <p className="mt-4 text-sm text-white/65">
+            {percentOff(course.list_price_cents, course.price_cents) > 0 &&
+              `${percentOff(course.list_price_cents, course.price_cents)}% off the usual ${formatUsd(course.list_price_cents ?? 0)} · `}
             One-time payment · Claude Pro required separately
             {course.has_guarantee ? "" : " · no refund guarantee"}
           </p>
