@@ -31,6 +31,7 @@ export default async function CourseProgressPage({
   const view = await getEnrollmentView(profile, slug);
   if (!view) notFound();
   if (view.enrollment.status === "revoked") redirect("/dashboard/courses");
+  if (view.course.format === "self_paced") redirect(`/dashboard/workshops/${view.course.slug}`);
 
   const { course, enrollment, progress, openDay } = view;
   const [titles, todayContent, sp] = await Promise.all([

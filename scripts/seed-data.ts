@@ -5,6 +5,7 @@
  *
  * The day-by-day tasks live in scripts/content/, one file per course.
  */
+import { aiAnimationInstagram } from "./content/ai-animation-instagram";
 import { aiForEverydayLife } from "./content/ai-for-everyday-life";
 import { buildDiscipline } from "./content/build-discipline";
 import { fixYourMoney } from "./content/fix-your-money";
@@ -31,8 +32,12 @@ export interface SeedCourse {
   books: { title: string; author: string }[];
   phases: { name: string; start_day: number; end_day: number }[];
   faq: { q: string; a: string }[];
-  /** One task per day. */
+  /** One task per day (daily courses) or one lesson each (workshops). */
   tasks: SeedTask[];
+  /** Workshops: every lesson open at once. Defaults to "daily". */
+  format?: "daily" | "self_paced";
+  /** Defaults to true. Workshops can be sold without the refund guarantee. */
+  hasGuarantee?: boolean;
 }
 
 /**
@@ -319,6 +324,76 @@ export const COURSES: SeedCourse[] = [
     tasks: talkWithConfidence,
   },
 ];
+
+/**
+ * Self-paced workshops. Sold on their own — never part of the All Access bundle.
+ * `days` is the number of lessons.
+ */
+export const WORKSHOPS: SeedCourse[] = [
+  {
+    slug: "ai-animation-instagram",
+    name: "AI Animation Videos & Instagram Growth",
+    category: "Creator",
+    emoji: "🎬",
+    accent_color: "#A8336A",
+    short_description:
+      "Make scroll-stopping animated Reels with Claude — no video editor — and the exact posting system that grew @mindfrombooks to 35K.",
+    description:
+      "A self-paced workshop. You set up a small AI video studio on your own computer, then make animated videos, edit your own footage and add voiceovers by describing what you want to Claude. The last module is the posting and growth system behind @mindfrombooks. Everything unlocks at once; work through it at your own pace.",
+    number_reason: "14 lessons in 3 modules — set up once, then create and grow",
+    outcomes: [
+      "A working AI video studio on your computer (Windows, Mac or Linux)",
+      "Animated Reels made from a prompt — no editing software",
+      "Natural voiceovers with ElevenLabs, plus free music and sound effects",
+      "A 3-a-day posting system and a weekly routine to grow on Instagram",
+    ],
+    notice:
+      "You'll need a paid Claude Pro plan (about US$20 a month, billed by Anthropic). ElevenLabs is optional: its free plan works but sounds less natural and has limits; better voices cost about US$5 a month. These are separate from this course.",
+    days: 14,
+    price_cents: 699,
+    format: "self_paced",
+    hasGuarantee: false,
+    books: [
+      { title: "Steal Like an Artist", author: "Austin Kleon" },
+      { title: "Show Your Work!", author: "Austin Kleon" },
+      { title: "Contagious", author: "Jonah Berger" },
+    ],
+    phases: [
+      { name: "Set up your studio", start_day: 1, end_day: 5 },
+      { name: "Make videos", start_day: 6, end_day: 10 },
+      { name: "Grow on Instagram", start_day: 11, end_day: 14 },
+    ],
+    faq: [
+      {
+        q: "Do I need any video editing experience?",
+        a: "No. You describe what you want; Claude builds and edits the video. The course shows every click.",
+      },
+      {
+        q: "What does it cost beyond the course?",
+        a: "A Claude Pro plan is required (about US$20 a month, paid to Anthropic). ElevenLabs is optional — free with lower quality and limits, or about US$5 a month for better voices.",
+      },
+      {
+        q: "Does it work on my computer?",
+        a: "Yes — Windows, Mac and Linux. Every command is given for each system.",
+      },
+      {
+        q: "Is there a refund guarantee?",
+        a: "No. This workshop opens in full the moment you buy, so it isn't covered by our daily-course refund guarantee.",
+      },
+      {
+        q: "Will I get 35K followers too?",
+        a: "We can't promise numbers — results depend on your niche, consistency and content. You get the exact system that grew @mindfrombooks.",
+      },
+    ],
+    tasks: aiAnimationInstagram,
+  },
+];
+
+/** Every course, daily and self-paced. */
+export const ALL_COURSES: SeedCourse[] = [...COURSES, ...WORKSHOPS];
+
+/** Public sample lessons for a workshop (the first two). */
+export const WORKSHOP_SAMPLE_LESSONS = 2;
 
 export const BUNDLE = {
   slug: "all-access",

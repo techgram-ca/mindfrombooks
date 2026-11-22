@@ -202,6 +202,32 @@ Run migrations `20261117000001_ratings_testimonials.sql` and `20261118000001_rem
 
 ---
 
+## Self-paced workshops
+
+A course with **Course type = Self-paced workshop** opens every lesson the moment it is bought:
+no days, no streak, no reminders, no refund guarantee unless you tick it. Learners see a
+**Workshops** tab in the dashboard (only when they own one), tick lessons off, copy prompts and
+commands (with Windows / Mac / Linux tabs) and watch explainer videos.
+
+The first one is **AI Animation Videos & Instagram Growth** (US$6.99, 14 lessons). Its lessons
+live in `scripts/content/ai-animation-instagram.ts`; regenerate its SQL with:
+
+```bash
+npm run workshop:sql
+```
+
+Run migrations `20261122000001_self_paced_workshops.sql` then
+`20261122000002_ai_animation_workshop.sql`.
+
+**Videos:** upload each explainer to YouTube as **Unlisted** (keep "Allow embedding" switched on
+so it can play on the lesson page), then paste the link into **Admin → Courses → (workshop) → Lessons**.
+The video id is stored in a table only admins can read and is sent only to enrolled learners when
+they press play, through a privacy-enhanced embed. This makes the link hard to find, not
+impossible — anyone who can watch a video can, with effort, copy it. Prompts to make the eight
+explainer videos with Claude Code are in `docs/explainer-video-prompts.md`.
+
+---
+
 ## Course content
 
 All 217 days are written in `scripts/content/`, one file per course. Every day cites the book its

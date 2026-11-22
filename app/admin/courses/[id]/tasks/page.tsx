@@ -22,6 +22,17 @@ export default async function CourseTasksPage({ params }: { params: Promise<{ id
     .order("day_number");
   const c = course as Course;
   const list = (tasks ?? []) as Task[];
+  const workshop = c.format === "self_paced";
+  const { data: videoRows } = await db
+    .from("lesson_videos")
+    .select("task_id, youtube_id")
+    .in(
+      "task_id",
+      list.map((t) => t.id),
+    );
+  const videos = Object.fromEntries(
+    (videoRows ?? []).map((v) => [v.task_id as string, v.youtube_id as string]),
+  );
   const written = list.filter(
     (t) => t.day_number <= c.days && !/coming soon$/i.test(t.title),
   ).length;
@@ -34,13 +45,18 @@ export default async function CourseTasksPage({ params }: { params: Promise<{ id
         ← {c.name}
       </Link>
       <div className="mt-2">
-        <AdminHeader title="Tasks" description={`${written} of ${c.days} days written.`} />
+        <AdminHeader
+          title={workshop ? "Lessons" : "Tasks"}
+          description={`${written} of ${c.days} ${workshop ? "lessons" : "days"} written.`}
+        />
       </div>
       <TaskEditor
         key={list.map((t) => `${t.id}:${t.day_number}`).join("|")}
         courseId={id}
         days={c.days}
         tasks={list}
+        workshop={workshop}
+        videos={videos}
       />
     </>
   );

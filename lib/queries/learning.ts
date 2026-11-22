@@ -23,7 +23,9 @@ import type {
   Task,
 } from "@/lib/types";
 
-export type LearnerPhase = "not_started" | "starts_tomorrow" | "in_progress" | "finished";
+/** "workshop" = a self-paced course: every lesson open, no days. */
+export type LearnerPhase =
+  "not_started" | "starts_tomorrow" | "in_progress" | "finished" | "workshop";
 
 export interface EnrollmentView {
   enrollment: Enrollment;
@@ -71,7 +73,23 @@ function buildView(
     respondedDays: responded,
     today,
     refundWindowDays: settings.refund_window_days,
+    format: course.format,
+    hasGuarantee: course.has_guarantee,
   });
+  if (course.format === "self_paced") {
+    return {
+      enrollment,
+      course,
+      phases,
+      today,
+      responded,
+      progress,
+      openDay: null,
+      todayDone: false,
+      phase: "workshop",
+      canRespond: false,
+    };
+  }
   const openDay = openDayNumber(enrollment.start_date, today, course.days);
   const phase: LearnerPhase = !enrollment.start_date
     ? "not_started"
@@ -101,7 +119,7 @@ function buildView(
  */
 export const getLearnerState = cache(async (profile: Profile): Promise<LearnerState> => {
   const supabase = await createClient();
-  const [settings, enrollmentsRes, responsesRes] = await Promise.all([
+  const [settings, enrollmentsRes, responsesRes, lessonsRes] = await Promise.all([
     getSettings(),
     supabase
       .from("enrollments")
@@ -109,6 +127,11 @@ export const getLearnerState = cache(async (profile: Profile): Promise<LearnerSt
       .eq("user_id", profile.id)
       .order("created_at", { ascending: true }),
     supabase.from("responses").select("enrollment_id, day_number").eq("user_id", profile.id),
+    // Ticked workshop lessons (fails soft before the workshop migration).
+    supabase
+      .from("lesson_progress")
+      .select("enrollment_id, lesson_number")
+      .eq("user_id", profile.id),
   ]);
   if (enrollmentsRes.error)
     throw new Error(`Could not load your courses: ${enrollmentsRes.error.message}`);
@@ -128,6 +151,12 @@ export const getLearnerState = cache(async (profile: Profile): Promise<LearnerSt
   >[]) {
     const list = byEnrollment.get(r.enrollment_id) ?? [];
     list.push(r.day_number);
+    byEnrollment.set(r.enrollment_id, list);
+  }
+  // Workshops: lessons ticked count where daily courses count responses.
+  for (const r of (lessonsRes.data ?? []) as { enrollment_id: string; lesson_number: number }[]) {
+    const list = byEnrollment.get(r.enrollment_id) ?? [];
+    list.push(r.lesson_number);
     byEnrollment.set(r.enrollment_id, list);
   }
 
@@ -159,7 +188,7 @@ export const getLearnerState = cache(async (profile: Profile): Promise<LearnerSt
   // Streak: consecutive local days with at least one response in any course.
   const activeDates: DateStr[] = [];
   for (const view of views) {
-    if (!view.enrollment.start_date) continue;
+    if (!view.enrollment.start_date || view.course.format === "self_paced") continue;
     for (const day of view.responded) activeDates.push(dateOfDay(view.enrollment.start_date, day));
   }
   const streak = computeStreak(activeDates, todayInTz(profile.timezone, now));

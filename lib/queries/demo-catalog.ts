@@ -3,11 +3,16 @@
  * local preview, CI build). Lets the public site render from the seed data so
  * you can look at it before connecting a database.
  */
-import { BUNDLE, COURSES, courseAllowances } from "@/scripts/seed-data";
+import {
+  ALL_COURSES,
+  BUNDLE,
+  WORKSHOP_SAMPLE_LESSONS,
+  courseAllowances,
+} from "@/scripts/seed-data";
 import type { Bundle, Course, CourseBook, CoursePhase, Task } from "@/lib/types";
 
 export function demoCourses(): Course[] {
-  return COURSES.map((c, i) => ({
+  return ALL_COURSES.map((c, i) => ({
     id: `demo-${c.slug}`,
     slug: c.slug,
     name: c.name,
@@ -22,7 +27,9 @@ export function demoCourses(): Course[] {
     days: c.days,
     price_cents: c.price_cents,
     currency: "usd",
-    grace_days: courseAllowances(c.days).graceDays,
+    grace_days: c.format === "self_paced" ? 0 : courseAllowances(c.days).graceDays,
+    format: c.format ?? "daily",
+    has_guarantee: c.hasGuarantee ?? true,
     cover_image_url: null,
     status: "published",
     sort_order: i + 1,
@@ -32,7 +39,7 @@ export function demoCourses(): Course[] {
 }
 
 export function demoBooks(slug: string): CourseBook[] {
-  const c = COURSES.find((x) => x.slug === slug);
+  const c = ALL_COURSES.find((x) => x.slug === slug);
   return (c?.books ?? []).map((b, i) => ({
     id: `demo-book-${slug}-${i}`,
     course_id: `demo-${slug}`,
@@ -44,7 +51,7 @@ export function demoBooks(slug: string): CourseBook[] {
 }
 
 export function demoPhases(slug: string): CoursePhase[] {
-  const c = COURSES.find((x) => x.slug === slug);
+  const c = ALL_COURSES.find((x) => x.slug === slug);
   return (c?.phases ?? []).map((p, i) => ({
     id: `demo-phase-${slug}-${i}`,
     course_id: `demo-${slug}`,
@@ -53,7 +60,7 @@ export function demoPhases(slug: string): CoursePhase[] {
 }
 
 export function demoTasks(slug: string): Task[] {
-  const c = COURSES.find((x) => x.slug === slug);
+  const c = ALL_COURSES.find((x) => x.slug === slug);
   if (!c) return [];
   return Array.from({ length: c.days }, (_, i) => {
     const real = c.tasks[i];
@@ -67,7 +74,10 @@ export function demoTasks(slug: string): Task[] {
       instructions: real?.instructions ?? [],
       response_prompt: real?.response_prompt ?? "",
       min_response_chars: 0,
-      is_sample: i < courseAllowances(c.days).sampleDays,
+      is_sample:
+        i <
+        (c.format === "self_paced" ? WORKSHOP_SAMPLE_LESSONS : courseAllowances(c.days).sampleDays),
+      resources: real?.resources ?? [],
     };
   });
 }

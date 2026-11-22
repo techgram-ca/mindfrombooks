@@ -4,6 +4,7 @@ import { BottomNav, SidebarNav } from "@/components/dashboard/nav";
 import { TimezoneSync } from "@/components/dashboard/timezone-sync";
 import { Logo } from "@/components/shared/logo";
 import { requireUser } from "@/lib/auth";
+import { getLearnerState } from "@/lib/queries/learning";
 
 // Always rendered per request for the signed-in person — never cached or prerendered.
 export const dynamic = "force-dynamic";
@@ -15,12 +16,16 @@ export const metadata: Metadata = {
 
 export default async function DashboardLayout({ children }: { children: ReactNode }) {
   const profile = await requireUser();
+  const { views } = await getLearnerState(profile);
+  const showWorkshops = views.some(
+    (v) => v.course.format === "self_paced" && v.enrollment.status !== "revoked",
+  );
   return (
     <div className="min-h-dvh md:grid md:grid-cols-[15rem_1fr]">
       <aside className="border-border bg-surface sticky top-0 hidden h-dvh flex-col border-r p-5 md:flex">
         <Logo href="/dashboard" />
         <div className="mt-8 flex-1">
-          <SidebarNav isAdmin={profile.role === "admin"} />
+          <SidebarNav isAdmin={profile.role === "admin"} showWorkshops={showWorkshops} />
         </div>
         <p className="text-muted-foreground truncate text-sm" title={profile.email}>
           {profile.email}
@@ -34,7 +39,7 @@ export default async function DashboardLayout({ children }: { children: ReactNod
           {children}
         </main>
       </div>
-      <BottomNav />
+      <BottomNav showWorkshops={showWorkshops} />
       {!profile.timezone_confirmed && <TimezoneSync />}
     </div>
   );

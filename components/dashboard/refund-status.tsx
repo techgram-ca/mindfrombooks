@@ -18,6 +18,7 @@ export function RefundStatus({
 
   if (enrollment.status === "refunded") return <Badge variant="neutral">Refunded</Badge>;
   if (enrollment.status === "revoked") return <Badge variant="danger">Access revoked</Badge>;
+  if (!course.has_guarantee) return <Badge variant="neutral">No refund guarantee</Badge>;
   if (!progress.isPaid) return <Badge variant="info">Free access</Badge>;
 
   if (progress.refundEligible) {

@@ -59,7 +59,10 @@ export default async function HomePage() {
     getSettings(),
     getTestimonials(undefined, 6),
   ]);
-  const totalDays = courses.reduce((sum, c) => sum + c.days, 0);
+  const totalDays = courses
+    .filter((c) => c.format !== "self_paced")
+    .reduce((sum, c) => sum + c.days, 0);
+  const bundleDays = (bundleDetail?.courses ?? []).reduce((sum, c) => sum + c.days, 0);
   const separate = bundleDetail?.courses.reduce((sum, c) => sum + c.price_cents, 0) ?? 0;
 
   return (
@@ -120,7 +123,7 @@ export default async function HomePage() {
               Pick what you want to change
             </h2>
             <p className="text-muted-foreground mt-2">
-              {courses.length} courses · {totalDays} days of action
+              {courses.length} courses · {totalDays} days of daily action
             </p>
           </div>
           <Link
@@ -146,7 +149,7 @@ export default async function HomePage() {
               {formatUsd(bundleDetail.bundle.price_cents)}
             </h2>
             <p className="text-primary-foreground/80 mt-3 max-w-xl">
-              {totalDays} days of daily action. Start each course when you&apos;re ready — one at a
+              {bundleDays} days of daily action. Start each course when you&apos;re ready — one at a
               time or a few together.
               {separate > bundleDetail.bundle.price_cents &&
                 ` Bought separately they'd cost ${formatUsd(separate)}.`}

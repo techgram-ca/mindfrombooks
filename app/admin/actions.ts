@@ -7,6 +7,7 @@ import { sendAdminInviteEmail } from "@/lib/emails";
 import { processRefund } from "@/lib/refund-service";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { parseTaskImport } from "@/lib/task-import";
+import { parseYouTubeId } from "@/lib/queries/workshop";
 import { siteUrl } from "@/lib/utils";
 import {
   couponSchema,
@@ -46,7 +47,13 @@ export async function saveCourseAction(input: unknown): Promise<AdminResult> {
   if (!parsed.success) return issue(parsed.error);
   const { id, books, phases, price_dollars, ...fields } = parsed.data;
   const db = createAdminClient();
-  const row = { ...fields, price_cents: Math.round(price_dollars * 100), currency: "usd" };
+  const row = {
+    ...fields,
+    // Workshops have no days to miss.
+    grace_days: fields.format === "self_paced" ? 0 : fields.grace_days,
+    price_cents: Math.round(price_dollars * 100),
+    currency: "usd",
+  };
 
   const { data: saved, error } = id
     ? await db.from("courses").update(row).eq("id", id).select("id").single()
@@ -78,8 +85,9 @@ export async function saveCourseAction(input: unknown): Promise<AdminResult> {
   const placeholders = Array.from({ length: fields.days }, (_, i) => ({
     course_id: courseId,
     day_number: i + 1,
-    title: `Day ${i + 1} — coming soon`,
-    response_prompt: "What did you do today, and what did you notice?",
+    title: `${fields.format === "self_paced" ? "Lesson" : "Day"} ${i + 1} — coming soon`,
+    response_prompt:
+      fields.format === "self_paced" ? "" : "What did you do today, and what did you notice?",
   }));
   const { error: taskError } = await db
     .from("tasks")
@@ -96,11 +104,28 @@ export async function saveTaskAction(input: unknown): Promise<AdminResult> {
   await requireAdmin();
   const parsed = taskSchema.safeParse(input);
   if (!parsed.success) return issue(parsed.error);
-  const { id, ...fields } = parsed.data;
-  const { error } = await createAdminClient().from("tasks").update(fields).eq("id", id);
+  const { id, video, ...fields } = parsed.data;
+  const db = createAdminClient();
+  const { error } = await db.from("tasks").update(fields).eq("id", id);
   if (error) return { error: error.message };
+  if (video !== undefined) {
+    if (video === "") {
+      await db.from("lesson_videos").delete().eq("task_id", id);
+    } else {
+      const youtubeId = parseYouTubeId(video);
+      if (!youtubeId)
+        return {
+          error:
+            "Saved the text, but that isn't a YouTube link. Paste the video's link or its 11-character id.",
+        };
+      const { error: videoError } = await db
+        .from("lesson_videos")
+        .upsert({ task_id: id, youtube_id: youtubeId }, { onConflict: "task_id" });
+      if (videoError) return { error: `Saved the text, but not the video: ${videoError.message}` };
+    }
+  }
   refreshSite();
-  return { message: "Task saved." };
+  return { message: "Saved." };
 }
 
 export async function reorderTasksAction(

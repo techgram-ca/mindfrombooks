@@ -124,7 +124,12 @@ export interface BundleDetail {
 }
 
 export const getBundle = cache(async (slug = "all-access"): Promise<BundleDetail | null> => {
-  if (!isSupabaseConfigured()) return { bundle: demoBundle(), courses: demoCourses() };
+  if (!isSupabaseConfigured()) {
+    return {
+      bundle: demoBundle(),
+      courses: demoCourses().filter((c) => c.format !== "self_paced"),
+    };
+  }
   const db = publicClient();
   const { data: bundle } = await db
     .from("bundles")
