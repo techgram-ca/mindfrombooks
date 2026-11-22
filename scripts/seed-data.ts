@@ -29,6 +29,8 @@ export interface SeedCourse {
   notice: string | null;
   days: number;
   price_cents: number;
+  /** Actual price shown struck through (set by migration 20261124000001 on live sites). */
+  listPriceCents?: number;
   books: { title: string; author: string }[];
   phases: { name: string; start_day: number; end_day: number }[];
   faq: { q: string; a: string }[];
@@ -351,6 +353,7 @@ export const WORKSHOPS: SeedCourse[] = [
       "You'll need a paid Claude Pro plan (about US$20 a month, billed by Anthropic). ElevenLabs is optional: its free plan works but sounds less natural and has limits; better voices cost about US$5 a month. These are separate from this course.",
     days: 8,
     price_cents: 699,
+    listPriceCents: 1999,
     format: "self_paced",
     hasGuarantee: false,
     books: [

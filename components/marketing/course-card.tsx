@@ -1,7 +1,7 @@
+import { PriceTag } from "@/components/marketing/price-tag";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import type { Course } from "@/lib/types";
-import { formatUsd } from "@/lib/pricing";
 
 export function CourseCard({ course }: { course: Course }) {
   return (
@@ -35,7 +35,11 @@ export function CourseCard({ course }: { course: Course }) {
         {course.number_reason}
       </p>
       <div className="mt-auto flex items-center justify-between pt-5">
-        <span className="text-lg font-semibold">{formatUsd(course.price_cents)}</span>
+        <PriceTag
+          priceCents={course.price_cents}
+          listPriceCents={course.list_price_cents}
+          priceClassName="text-lg font-semibold"
+        />
         <span className="text-accent-strong inline-flex items-center gap-1 text-sm font-medium">
           View course
           <ArrowRight

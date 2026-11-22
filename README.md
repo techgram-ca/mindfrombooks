@@ -220,6 +220,11 @@ Run migrations `20261122000001_self_paced_workshops.sql`,
 `20261122000002_ai_animation_workshop.sql`, then `20261123000001_ai_animation_workshop_8_lessons.sql`
 (the latest; `npm run workshop:sql` rewrites this one).
 
+**Discount display:** in **Admin → Courses**, set an **Actual price** (shown struck through) and a
+**Selling price** (what people pay). The site shows the percent off, rounded to a whole number
+(70.2% → 70%). Leave Actual price empty for no discount. Needs migration
+`20261124000001_course_list_price.sql`, which also sets the workshop to US$19.99 → US$6.99.
+
 **Videos:** upload each explainer to YouTube as **Unlisted** (keep "Allow embedding" switched on
 so it can play on the lesson page), then paste the link into **Admin → Courses → (workshop) → Lessons**.
 The video id is stored in a table only admins can read and is sent only to enrolled learners when

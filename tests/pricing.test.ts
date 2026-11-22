@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { discountCents, finalPriceCents, formatUsd, splitAmount } from "@/lib/pricing";
+import { discountCents, finalPriceCents, formatUsd, splitAmount, percentOff } from "@/lib/pricing";
 
 describe("discounts", () => {
   it("applies a percentage", () => {
@@ -46,6 +46,23 @@ describe("bundle refund split", () => {
   });
   it("returns nothing for zero parts", () => {
     expect(splitAmount(3900, 0)).toEqual([]);
+  });
+});
+
+describe("percentOff", () => {
+  it("rounds to a whole percent", () => {
+    expect(percentOff(1999, 699)).toBe(65); // 65.03
+    expect(percentOff(1000, 298)).toBe(70); // 70.2 → 70
+    expect(percentOff(1000, 295)).toBe(71); // 70.5 → 71
+  });
+  it("is 0 without a real discount", () => {
+    expect(percentOff(null, 699)).toBe(0);
+    expect(percentOff(undefined, 699)).toBe(0);
+    expect(percentOff(699, 699)).toBe(0);
+    expect(percentOff(500, 699)).toBe(0);
+  });
+  it("is 100 when free", () => {
+    expect(percentOff(1999, 0)).toBe(100);
   });
 });
 
