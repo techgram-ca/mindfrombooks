@@ -51,6 +51,21 @@ export const POST = handle(async (request: Request) => {
     .select("id", { count: "exact", head: true })
     .eq("enrollment_id", data.id)
     .lte("lesson_number", course.days);
+  // All lessons ticked → completed (shows under My courses → Completed);
+  // unticking one reopens it.
+  const allDone = (count ?? 0) >= course.days;
+  if (allDone && data.status === "active")
+    await db
+      .from("enrollments")
+      .update({ status: "completed", completed_at: new Date().toISOString() })
+      .eq("id", data.id)
+      .eq("status", "active");
+  else if (!allDone && data.status === "completed")
+    await db
+      .from("enrollments")
+      .update({ status: "active", completed_at: null })
+      .eq("id", data.id)
+      .eq("status", "completed");
   await db
     .from("profiles")
     .update({ last_active_at: new Date().toISOString() })

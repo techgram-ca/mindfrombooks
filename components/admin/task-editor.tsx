@@ -465,8 +465,13 @@ export function TaskEditor({
                 >
                   <GripVertical className="size-4" />
                 </span>
-                <span className="text-muted-foreground w-12 shrink-0 text-sm font-semibold">
-                  Day {index + 1}
+                <span
+                  className={cn(
+                    "text-muted-foreground shrink-0 text-sm font-semibold",
+                    workshop ? "w-16" : "w-12",
+                  )}
+                >
+                  {workshop ? "Lesson" : "Day"} {index + 1}
                 </span>
                 <button
                   type="button"

@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import { ArrowLeft, ArrowRight } from "lucide-react";
 import { MarkDoneButton } from "@/components/workshop/mark-done-button";
 import { LessonResources } from "@/components/workshop/lesson-resources";
@@ -22,7 +22,8 @@ export default async function LessonPage({
   if (!Number.isInteger(number) || number < 1) notFound();
   const profile = await requireUser(`/dashboard/workshops/${slug}/${raw}`);
   const view = await getWorkshopView(profile, slug);
-  if (!view) notFound();
+  // Not bought yet (or revoked): send them to the offer page.
+  if (!view) redirect(`/courses/${slug}`);
   const lessons = await getLessons(view.course.id, view.course.days);
   const lesson = lessons.find((l) => l.number === number);
   if (!lesson) notFound();

@@ -2,70 +2,70 @@ import type { WorkshopOfferContent } from "./types";
 
 export const aiAnimationOffer: WorkshopOfferContent = {
   eyebrow: "Self-paced workshop · 14 lessons · Windows, Mac & Linux",
-  headline: [
-    "I grew @mindfrombooks to 35K",
-    "without opening a video editor.",
-    "Here's exactly how.",
-  ],
+  headline: ["I grew @mindfrombooks to 35K", "in under a month.", "No video editor."],
   subhead:
-    "Every Reel on the account was made by describing it to Claude — no timelines, no keyframes, no editing software. This workshop sets up the same AI video studio on your computer, then gives you the prompts, the voiceover setup and the posting system behind the growth.",
+    "Every Reel was made by describing it to Claude. This workshop sets up the same AI video studio on your computer and hands you the exact prompts and posting system.",
   heroPoints: [
-    "Animated Reels from a single prompt",
-    "Your own footage edited and captioned for you",
-    "Natural voiceovers with ElevenLabs",
-    "The 3-a-day posting system that grew the account",
+    "Animated Reels from one prompt",
+    "Your own clips cut and captioned for you",
+    "Natural AI voiceovers",
+    "The 3-a-day posting system",
   ],
-  story: {
-    title: "35K followers. Zero hours in a video editor.",
-    paragraphs: [
-      "When I started @mindfrombooks I knew what I wanted to say, but not how to make videos look good. Learning editing software felt like a second job.",
-      "So I stopped trying. I set up Claude on my computer, gave it a folder of videos whose style I liked, and described what I wanted. It wrote the script, built the animation, added the voice and exported the file. I directed; it edited.",
-      "Then I posted — three times a day, every day — and kept inventing new styles whenever the old ones stopped working. That's the whole system, and it's what this workshop teaches, step by step.",
+  comparison: {
+    title: "The old way vs the Claude way",
+    intro: "What it takes to post 3 Reels a day — about 90 a month.",
+    rows: [
+      {
+        label: "Time per 30-second Reel",
+        editor: "2–3 hours of cutting, captions and exports",
+        claude: "About 15–20 minutes: describe, review, tweak",
+      },
+      {
+        label: "Time for 90 Reels a month",
+        editor: "180+ hours — a second full-time job",
+        claude: "About 25–30 hours, made in batches",
+      },
+      {
+        label: "Skills to learn",
+        editor: "Weeks of editing tutorials",
+        claude: "Plain English — if you can describe it, you can make it",
+      },
+      {
+        label: "Software",
+        editor: "About US$10–70 a month in editing apps",
+        claude: "About US$20 a month for Claude Pro; video tools are free",
+      },
+      {
+        label: "Or hire an editor",
+        editor: "About US$20–50 per Reel — US$1,800+ for 90",
+        claude: "You're the director; Claude does the editing",
+      },
+      {
+        label: "Voiceover",
+        editor: "Record yourself again and again",
+        claude: "ElevenLabs: free, or about US$5 a month for better voices",
+      },
+      {
+        label: "Fresh styles",
+        editor: "Hunt for new templates and plugins",
+        claude: "One prompt invents five new looks from your references",
+      },
     ],
-    signoff: "— the creator of @mindfrombooks",
+    footnote:
+      "Typical estimates for a beginner. Your times and prices will vary, and growth is never guaranteed — it depends on your content and your consistency.",
   },
-  pains: [
-    {
-      title: "Editing eats your evenings",
-      body: "One 30-second Reel shouldn't take three hours of cutting, captioning and exporting.",
-    },
-    {
-      title: "Templates all look the same",
-      body: "Everyone uses the same five app templates, so nothing you post stands out.",
-    },
-    {
-      title: "Inconsistent posting",
-      body: "You post a few days in a row, run out of time, and the account goes quiet for weeks.",
-    },
-    {
-      title: "Voiceovers feel awkward",
-      body: "Recording your own voice ten times to get one clean take — or skipping voice altogether.",
-    },
-  ],
   outcomes: [
     {
-      title: "Your AI video studio",
-      body: "Claude Code on your computer with every free video tool installed by one prompt, and rules it follows every time.",
+      title: "Set up your studio",
+      body: "Claude Code on your computer, every free video tool installed by one prompt, and your ElevenLabs voice connected. Lessons 1–5.",
     },
     {
-      title: "Animation from a prompt",
-      body: "Describe an idea; get a finished vertical Reel with on-screen text, motion and captions.",
+      title: "Make videos",
+      body: "Animated Reels inspired by styles you like, your own footage edited, voice and music added, and new styles on demand. Lessons 6–10.",
     },
     {
-      title: "Your footage, edited",
-      body: "Drop raw clips in a folder; get them cut, captioned and punched-in.",
-    },
-    {
-      title: "Voice and sound",
-      body: "Natural ElevenLabs voiceovers, plus free music and sound effects with the licences tracked.",
-    },
-    {
-      title: "Styles that don't go stale",
-      body: "A prompt that invents new looks from your references when the old ones stop working.",
-    },
-    {
-      title: "A growth system",
-      body: "What to post, when to post it, and how to read your numbers each week.",
+      title: "Grow on Instagram",
+      body: "Spot trends, post 3 a day at 9 am, 2 pm and 8 pm, read your numbers and double down on what works. Lessons 11–14.",
     },
   ],
   peek: {
@@ -86,51 +86,30 @@ Then build it and render to exports/.`,
     {
       item: "This workshop",
       cost: "US$6.99 once",
-      note: "Lifetime access, no subscription.",
+      note: "Lifetime access. No subscription.",
       required: true,
     },
     {
       item: "Claude Pro",
-      cost: "about US$20/month",
-      note: "Required — Claude Code comes with a paid Claude plan. Billed by Anthropic.",
+      cost: "≈ US$20/mo",
+      note: "Billed by Anthropic.",
       required: true,
     },
     {
-      item: "ElevenLabs voices",
-      cost: "free, or about US$5/month",
-      note: "Optional. The free plan works with lower quality and limits; the paid plan sounds far more natural.",
+      item: "ElevenLabs",
+      cost: "US$0–5/mo",
+      note: "Free plan works; paid sounds more natural.",
       required: false,
     },
     {
-      item: "Video tools, music, sound effects",
+      item: "Video tools, music, sound",
       cost: "free",
-      note: "Installed by Claude for you; free sound libraries.",
+      note: "Installed for you by Claude.",
       required: false,
     },
   ],
-  system: {
-    title: "The posting system behind the growth",
-    points: [
-      "3 Reels a day — 9 am, 2 pm and 8 pm in your audience's timezone",
-      "Make them in batches, schedule them, and never post in a panic",
-      "A hook in the first 2 seconds, captions always on",
-      "A new style whenever the old one starts to feel familiar",
-      "A 10-minute weekly review of what got shared and saved",
-    ],
-  },
-  forYou: [
-    "You want to post Reels but hate editing",
-    "You run a page, a small business or a personal brand",
-    "You're happy to follow steps on your own computer",
-    "You can spend about an hour on setup, then 20–30 minutes per batch of videos",
-  ],
-  notForYou: [
-    "You won't pay for Claude Pro — it's required",
-    "You want a guaranteed number of followers (nobody can honestly promise that)",
-    "You're looking for traditional editing-software training",
-  ],
   finalCta: {
-    title: "Your next 30 Reels could be made without opening an editor.",
-    body: "Set up the studio once, then make videos by describing them. Every lesson is open the moment you join.",
+    title: "Stop editing. Start directing.",
+    body: "Every lesson opens the moment you join. Set up once, then make your next Reel by describing it.",
   },
 };
