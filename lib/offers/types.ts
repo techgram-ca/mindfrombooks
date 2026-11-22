@@ -41,14 +41,16 @@ export interface WorkshopOfferContent {
   headline: string[];
   subhead: string;
   heroPoints: string[];
-  story: { title: string; paragraphs: string[]; signoff: string };
-  pains: { title: string; body: string }[];
+  /** Video editor vs the Claude studio, row by row. */
+  comparison: {
+    title: string;
+    intro: string;
+    rows: { label: string; editor: string; claude: string }[];
+    footnote: string;
+  };
   outcomes: { title: string; body: string }[];
   /** A real prompt from the course, shown as a preview. */
   peek: { lesson: number; label: string; prompt: string };
   costs: { item: string; cost: string; note: string; required: boolean }[];
-  system: { title: string; points: string[] };
-  forYou: string[];
-  notForYou: string[];
   finalCta: { title: string; body: string };
 }
