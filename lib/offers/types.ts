@@ -48,6 +48,21 @@ export interface WorkshopOfferContent {
     rows: { label: string; editor: string; claude: string }[];
     footnote: string;
   };
+  /** What you need vs what you don't. */
+  needs: { yes: string[]; no: string[] };
+  /** Zero to posting, step by step. */
+  timeline: {
+    title: string;
+    intro: string;
+    steps: { when: string; title: string; body: string }[];
+  };
+  /** Why an audience pays. Must carry an honest disclaimer. */
+  money: {
+    title: string;
+    intro: string;
+    points: { title: string; body: string }[];
+    disclaimer: string;
+  };
   outcomes: { title: string; body: string }[];
   /** A real prompt from the course, shown as a preview. */
   peek: { lesson: number; label: string; prompt: string };
