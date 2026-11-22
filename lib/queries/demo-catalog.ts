@@ -26,6 +26,7 @@ export function demoCourses(): Course[] {
     notice: c.notice,
     days: c.days,
     price_cents: c.price_cents,
+    list_price_cents: c.listPriceCents ?? null,
     currency: "usd",
     grace_days: c.format === "self_paced" ? 0 : courseAllowances(c.days).graceDays,
     format: c.format ?? "daily",

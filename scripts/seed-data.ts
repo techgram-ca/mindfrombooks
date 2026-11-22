@@ -29,6 +29,8 @@ export interface SeedCourse {
   notice: string | null;
   days: number;
   price_cents: number;
+  /** Actual price shown struck through (set by migration 20261124000001 on live sites). */
+  listPriceCents?: number;
   books: { title: string; author: string }[];
   phases: { name: string; start_day: number; end_day: number }[];
   faq: { q: string; a: string }[];
@@ -340,7 +342,7 @@ export const WORKSHOPS: SeedCourse[] = [
       "Make scroll-stopping animated Reels with Claude — no video editor — and the exact posting system that grew @mindfrombooks to 35K.",
     description:
       "A self-paced workshop. You set up a small AI video studio on your own computer, then make animated videos, edit your own footage and add voiceovers by describing what you want to Claude. The last module is the posting and growth system behind @mindfrombooks. Everything unlocks at once; work through it at your own pace.",
-    number_reason: "14 lessons in 3 modules — set up once, then create and grow",
+    number_reason: "8 lessons, one video each — set up once, then create and grow",
     outcomes: [
       "A working AI video studio on your computer (Windows, Mac or Linux)",
       "Animated Reels made from a prompt — no editing software",
@@ -349,8 +351,9 @@ export const WORKSHOPS: SeedCourse[] = [
     ],
     notice:
       "You'll need a paid Claude Pro plan (about US$20 a month, billed by Anthropic). ElevenLabs is optional: its free plan works but sounds less natural and has limits; better voices cost about US$5 a month. These are separate from this course.",
-    days: 14,
+    days: 8,
     price_cents: 699,
+    listPriceCents: 1999,
     format: "self_paced",
     hasGuarantee: false,
     books: [
@@ -359,9 +362,9 @@ export const WORKSHOPS: SeedCourse[] = [
       { title: "Contagious", author: "Jonah Berger" },
     ],
     phases: [
-      { name: "Set up your studio", start_day: 1, end_day: 5 },
-      { name: "Make videos", start_day: 6, end_day: 10 },
-      { name: "Grow on Instagram", start_day: 11, end_day: 14 },
+      { name: "Set up your studio", start_day: 1, end_day: 3 },
+      { name: "Make videos", start_day: 4, end_day: 7 },
+      { name: "Grow on Instagram", start_day: 8, end_day: 8 },
     ],
     faq: [
       {

@@ -8,6 +8,15 @@ export interface CouponDiscount {
   amount_off_cents: number | null;
 }
 
+/**
+ * Percent off from the actual (list) price to the selling price, rounded to a
+ * whole number (70.2 → 70). 0 when there is no real discount.
+ */
+export function percentOff(listCents: number | null | undefined, sellCents: number): number {
+  if (!listCents || listCents <= sellCents || listCents <= 0) return 0;
+  return Math.round(((listCents - sellCents) / listCents) * 100);
+}
+
 /** Discount in cents, never more than the price. */
 export function discountCents(priceCents: number, coupon: CouponDiscount | null): number {
   if (!coupon || priceCents <= 0) return 0;

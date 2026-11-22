@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { Suspense } from "react";
 import { Check, Info, Lock } from "lucide-react";
 import { BookCard } from "@/components/marketing/book-card";
+import { PriceTag } from "@/components/marketing/price-tag";
 import { EnrollPanel } from "@/components/marketing/enroll-panel";
 import { Faq } from "@/components/marketing/faq";
 import { OfferPage } from "@/components/offer/offer-page";
@@ -94,6 +95,7 @@ export default async function CoursePage({ params }: { params: Params }) {
       <EnrollPanel
         product={{ kind: "course", id: course.id, slug: course.slug, name: course.name }}
         priceCents={course.price_cents}
+        listPriceCents={course.list_price_cents}
         note="Day 1 opens tomorrow morning, in your timezone."
       />
     </Suspense>
@@ -118,7 +120,13 @@ export default async function CoursePage({ params }: { params: Params }) {
               {course.short_description}
             </p>
             <div className="mt-5 flex flex-wrap items-center gap-x-5 gap-y-2 text-[15px]">
-              <span className="font-semibold">{formatUsd(course.price_cents)} one-time</span>
+              <span className="font-semibold">
+                <PriceTag
+                  priceCents={course.price_cents}
+                  listPriceCents={course.list_price_cents}
+                />{" "}
+                one-time
+              </span>
               <span className="text-muted-foreground">One task a day</span>
               <span className="text-muted-foreground">5–15 minutes</span>
             </div>

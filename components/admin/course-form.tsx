@@ -9,6 +9,7 @@ import { useSave } from "@/components/admin/use-save";
 import { Button } from "@/components/ui/button";
 import { Card, CardBody } from "@/components/ui/card";
 import { FieldHint, Input, Label, Select, Textarea } from "@/components/ui/input";
+import { formatUsd, percentOff } from "@/lib/pricing";
 import type { Course, CourseBook, CoursePhase, FaqItem } from "@/lib/types";
 
 interface BookRow {
@@ -54,6 +55,7 @@ export function CourseForm({
     notice: course?.notice ?? "",
     days: String(course?.days ?? 21),
     price_dollars: course ? (course.price_cents / 100).toFixed(2) : "9.99",
+    list_price_dollars: course?.list_price_cents ? (course.list_price_cents / 100).toFixed(2) : "",
     format: course?.format ?? "daily",
     grace_days: String(course?.grace_days ?? 0),
     cover_image_url: course?.cover_image_url ?? "",
@@ -165,7 +167,23 @@ export function CourseForm({
             <FieldHint>Lowering this hides later tasks but keeps their content.</FieldHint>
           </div>
           <div>
-            <Label htmlFor="price">Price (US$)</Label>
+            <Label htmlFor="list-price">Actual price (US$)</Label>
+            <Input
+              id="list-price"
+              type="number"
+              min={0}
+              step="0.01"
+              placeholder="Optional"
+              value={f.list_price_dollars}
+              onChange={set("list_price_dollars")}
+              aria-describedby="list-price-hint"
+            />
+            <FieldHint id="list-price-hint">
+              The usual price, shown struck through. Leave empty for no discount.
+            </FieldHint>
+          </div>
+          <div>
+            <Label htmlFor="price">Selling price (US$)</Label>
             <Input
               id="price"
               type="number"
@@ -174,7 +192,20 @@ export function CourseForm({
               value={f.price_dollars}
               onChange={set("price_dollars")}
               required
+              aria-describedby="price-hint"
             />
+            <FieldHint id="price-hint">
+              {(() => {
+                const list = Math.round(Number(f.list_price_dollars) * 100);
+                const sell = Math.round(Number(f.price_dollars) * 100);
+                const off = percentOff(list, sell);
+                if (f.list_price_dollars && list <= sell)
+                  return "Must be lower than the actual price to show a discount.";
+                return off > 0
+                  ? `What people pay. Shows as ${formatUsd(sell)} (${off}% off ${formatUsd(list)}).`
+                  : "What people pay at checkout.";
+              })()}
+            </FieldHint>
           </div>
           <div>
             <Label htmlFor="grace">Grace days</Label>

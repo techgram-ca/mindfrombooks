@@ -6,12 +6,14 @@ import { Loader2, Tag, X } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input, Label } from "@/components/ui/input";
-import { formatUsd } from "@/lib/pricing";
+import { formatUsd, percentOff } from "@/lib/pricing";
 import { track } from "@/lib/track";
 
 interface Props {
   product: { kind: "course" | "bundle"; id: string; slug: string; name: string };
   priceCents: number;
+  /** Actual price before discount, shown struck through. */
+  listPriceCents?: number | null;
   /** Small line under the button, e.g. the start-date promise. */
   note?: string;
   showStickyBar?: boolean;
@@ -29,6 +31,7 @@ interface Applied {
 export function EnrollPanel({
   product,
   priceCents,
+  listPriceCents,
   note,
   showStickyBar = true,
   guarantee = true,
@@ -139,14 +142,23 @@ export function EnrollPanel({
   const isFree = finalCents === 0;
   const cta = isFree ? "Enroll free" : `Enroll · ${formatUsd(finalCents)}`;
 
+  // Struck-through price: the actual price if set, else the price before a code.
+  const wasCents = Math.max(listPriceCents ?? 0, priceCents);
+  const off = percentOff(wasCents, finalCents);
   const price = (
-    <div className="flex items-baseline gap-2">
+    <div className="flex flex-wrap items-baseline gap-x-2 gap-y-1">
       <span className="font-serif text-3xl font-semibold">
         {isFree ? "Free" : formatUsd(finalCents)}
       </span>
-      {applied && applied.discountCents > 0 && (
+      {off > 0 && (
         <span className="text-muted-foreground text-base line-through">
-          {formatUsd(priceCents)}
+          <span className="sr-only">was </span>
+          {formatUsd(wasCents)}
+        </span>
+      )}
+      {off > 0 && (
+        <span className="bg-success-soft text-success self-center rounded-full px-2.5 py-0.5 text-sm font-semibold">
+          {off}% off
         </span>
       )}
       {!isFree && <span className="text-muted-foreground text-sm">one-time</span>}
@@ -241,7 +253,7 @@ export function EnrollPanel({
               <p className="text-muted-foreground text-sm">
                 {isFree
                   ? "Free with your code"
-                  : `${formatUsd(finalCents)}${guarantee ? " · refund guarantee" : " · one-time"}`}
+                  : `${formatUsd(finalCents)}${off > 0 ? ` · ${off}% off` : guarantee ? " · refund guarantee" : " · one-time"}`}
               </p>
             </div>
             <Button onClick={enroll} disabled={enrolling}>
