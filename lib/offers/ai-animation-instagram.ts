@@ -1,15 +1,15 @@
 import type { WorkshopOfferContent } from "./types";
 
 export const aiAnimationOffer: WorkshopOfferContent = {
-  eyebrow: "Self-paced workshop · 8 video lessons · Windows, Mac & Linux",
-  headline: ["I grew @mindfrombooks to 35K", "in under a month.", "No video editor."],
+  eyebrow: "The exact system that grew @mindfrombooks to 35K in under a month",
+  headline: ["No editing skills.", "No design skills.", "2–3 hours from now, you're a creator."],
   subhead:
-    "Every Reel was made by describing it to Claude. This workshop sets up the same AI video studio on your computer and hands you the exact prompts and posting system.",
+    "If you can copy, paste and click, you can do this. You type what you want — Claude makes the video. Set up your studio, make your first Reel and post it, all in one afternoon.",
   heroPoints: [
-    "Animated Reels from one prompt",
-    "Your own clips cut and captioned for you",
-    "Natural AI voiceovers",
-    "The 3-a-day posting system",
+    "Basic computer skills — that's all you need",
+    "Your first Reel posted in 2–3 hours",
+    "No camera, no face, no editing app",
+    "Grow an audience brands pay to reach",
   ],
   comparison: {
     title: "The old way vs the Claude way",
@@ -53,6 +53,66 @@ export const aiAnimationOffer: WorkshopOfferContent = {
     ],
     footnote:
       "Typical estimates for a beginner. Your times and prices will vary, and growth is never guaranteed — it depends on your content and your consistency.",
+  },
+  needs: {
+    yes: [
+      "A Windows, Mac or Linux computer",
+      "Basic skills: copy, paste, click",
+      "A Claude Pro plan",
+      "An afternoon to set up",
+    ],
+    no: [
+      "Video editing skills or software",
+      "Design or animation skills",
+      "Coding — Claude writes every line",
+      "A camera, a studio or showing your face",
+    ],
+  },
+  timeline: {
+    title: "From zero to content creator in one afternoon",
+    intro: "Follow the 8 video lessons in order. Copy each prompt, paste it, press enter.",
+    steps: [
+      {
+        when: "Hour 1",
+        title: "Your studio is ready",
+        body: "Claude Pro set up, one prompt installs every free video tool, your voice is connected. Lessons 1–3.",
+      },
+      {
+        when: "Hour 2",
+        title: "Your first Reel is made",
+        body: "Pick a style you love, describe one idea, and get a finished animated Reel with voice and music. Lessons 4–6.",
+      },
+      {
+        when: "Hour 3",
+        title: "You're posting like a pro",
+        body: "Fresh styles on demand and a 3-a-day posting plan for your whole week. Lessons 7–8.",
+      },
+    ],
+  },
+  money: {
+    title: "Followers are an asset. Brands pay to reach them.",
+    intro:
+      "Every Reel you post is another chance to be found. Once you've built an engaged audience, brands pay creators to promote their products — and bigger accounts earn thousands a month from deals like these.",
+    points: [
+      {
+        title: "Sponsored Reels",
+        body: "Brands pay you to feature their product in a video — made in minutes with your studio.",
+      },
+      {
+        title: "Paid promotions",
+        body: "Shoutouts and story posts for pages and businesses that want your audience.",
+      },
+      {
+        title: "Affiliate links",
+        body: "Earn a cut every time a follower buys something you recommend.",
+      },
+      {
+        title: "Your own offers",
+        body: "Sell your own products, services or courses to people who already trust you.",
+      },
+    ],
+    disclaimer:
+      "No income or follower numbers are promised. Earnings depend on your niche, your audience, your engagement and the work you put in — most creators earn nothing from deals until they've built a real audience.",
   },
   outcomes: [
     {
@@ -109,7 +169,7 @@ Then build it and render to exports/.`,
     },
   ],
   finalCta: {
-    title: "Stop editing. Start directing.",
-    body: "Every lesson opens the moment you join. Set up once, then make your next Reel by describing it.",
+    title: "Every day you wait is 3 Reels you didn't post.",
+    body: "Start this afternoon. In 2–3 hours your studio is set up and your first Reel is live — no skills, no editor, no excuses.",
   },
 };
