@@ -1,0 +1,36 @@
+[
+  {
+    "day_number": 9,
+    "title": "Bonus: 20 animation styles and the all-in-one prompt",
+    "book_insight": "This is the prompt to keep coming back to. Pick a style from the list of 20, write your idea in one line, and choose your voice — your own recording or an ElevenLabs voice. One paste gives you a finished Reel. Rotating styles keeps your feed fresh: use one style for three videos, then switch.",
+    "book_reference": "Steal Like an Artist — Austin Kleon",
+    "instructions": [
+      "Pick a style from the list below, or combine two for something nobody else is posting.",
+      "Write your idea in one line — one idea per video.",
+      "Choose your voiceover. Your own voice: record it on your phone in a quiet room and save it in raw/ (MP3, WAV or M4A). An AI voice: let Claude write the script and make it with ElevenLabs.",
+      "Copy the all-in-one prompt, replace everything in [brackets], and delete the voiceover option you're not using.",
+      "Read the plan Claude shows you, ask for changes, then say “go ahead and render”.",
+      "Watch it on your phone and run the export checklist before posting.",
+      "Keep a note of which styles get the most shares and saves, and use those more often."
+    ],
+    "response_prompt": "",
+    "is_sample": false,
+    "resources": [
+      {
+        "kind": "prompt",
+        "label": "20 animation styles",
+        "content": "Pick one — or combine two for something new (e.g. \"Neon glow + Newspaper collage\").\n\n1. Kinetic typography — Big bold words animate in time with the voice. Fast cuts, punchy scale-ins, one or two accent colours.\n2. Paper cut-out — Layered paper shapes with soft drop shadows and a slight stop-motion jitter. Warm, handmade feel.\n3. Whiteboard doodle — Black marker lines draw themselves on a white board; a hand-drawn arrow or circle highlights each point.\n4. Chalkboard — Chalk-textured lines and text on a dark board, revealed with dusty strokes. Great for lessons and tips.\n5. Flat 2D motion graphics — Clean vector shapes, bright flat colours, smooth easing and icons that pop in.\n6. Isometric 3D — Tiny isometric scenes and blocks that build themselves up piece by piece.\n7. Neon glow — Glowing neon lines and text on a dark background, with a subtle flicker and light bloom.\n8. Retro 80s synthwave — Sunset gradients, a glowing grid horizon, scanlines and chrome text.\n9. Newspaper collage — Cut-out headlines, halftone photos, torn paper edges and tape, shuffled across the screen.\n10. Glitch — RGB split, digital distortion and glitchy cuts between scenes. Edgy and fast.\n11. Minimal line art — One continuous line that morphs from object to object on a plain background.\n12. Claymation look — Soft, rounded 3D shapes with squishy, bouncy movement and a playful feel.\n13. Pixel art — Chunky 8-bit sprites, game-style text boxes and retro sound cues.\n14. Data story — Animated charts, counters ticking up and icons that make numbers feel dramatic.\n15. Comic book — Panels, halftone dots, speech bubbles and big impact words like WOW or BAM.\n16. Watercolour — Soft painted textures that bleed in, gentle fades and a calm, artistic mood.\n17. Blueprint — White technical lines on a blue grid, with measurements and labels drawing in.\n18. Liquid shapes — Gradient blobs that flow and morph into each new scene. Smooth and modern.\n19. Split-screen before/after — The screen splits in two to compare wrong vs right, before vs after, or myth vs fact.\n20. Notebook sketch — Lined paper, pen scribbles, sticky notes and highlighter swipes, like a study notebook."
+      },
+      {
+        "kind": "prompt",
+        "label": "All-in-one video prompt",
+        "content": "Make a vertical Instagram Reel (1080x1920, 30 fps) following CLAUDE.md.\n\nANIMATION STYLE: [STYLE — e.g. \"Paper cut-out\", or combine two: \"Neon glow + Newspaper collage\"]\nIDEA: [YOUR IDEA IN ONE LINE — e.g. \"3 money habits from The Psychology of Money\"]\nLENGTH: [20–30 seconds]\n\nVOICEOVER — keep ONE option and delete the other:\nA) Use my recording: raw/[your-voiceover-file.mp3]. Transcribe it (npx hyperframes transcribe or whisper), time every scene and caption to my words, and don't change what I say.\nB) Generate it: write a voiceover script for the idea and show it to me. After I approve it, create the voice with the ElevenLabs API. Read the key from ELEVENLABS_API_KEY and never print it. First tell me roughly how many characters it will use and suggest 3 voices that fit.\n\nThen:\n1. Show me the plan first: the hook (first 2 seconds), each scene with its on-screen text and length, and how the style will look (colours, fonts, motion). Wait for my OK.\n2. Build it in studio-hyperframes (or studio-remotion if that suits the style better). Match the animation style closely, but never copy a reference video.\n3. Add burned-in captions synced to the voice, plus quiet royalty-free background music and sound effects from free sources — log every file and its licence in credits.md. ElevenLabs is for the voice only.\n4. Render to exports/[YYYY-MM-DD-short-title].mp4, check it against the export checklist, and tell me the file name and length."
+      },
+      {
+        "kind": "note",
+        "label": "Recording your own voice",
+        "content": "Use your phone's voice recorder in a quiet room with soft furnishings, hold the phone about a hand's width from your mouth, and leave a second of silence at the start and end. Name the file clearly, e.g. raw/voiceover-money-habits.m4a."
+      }
+    ]
+  }
+]
