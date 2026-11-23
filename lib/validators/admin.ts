@@ -97,6 +97,8 @@ export const taskSchema = taskFieldsSchema.extend({
 });
 export const importTaskSchema = taskFieldsSchema.extend({
   day_number: z.coerce.number().int().min(1).max(366),
+  /** Workshops: copy-able blocks. Left out = keep the lesson's current blocks. */
+  resources: z.array(lessonResourceSchema).max(20).optional(),
 });
 export type ImportTask = z.infer<typeof importTaskSchema>;
 
