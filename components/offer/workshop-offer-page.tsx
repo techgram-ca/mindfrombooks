@@ -1,6 +1,15 @@
 import Link from "next/link";
 import { Suspense } from "react";
-import { ArrowRight, Check, Clapperboard, Info, PlayCircle, X } from "lucide-react";
+import {
+  ArrowRight,
+  Check,
+  Clapperboard,
+  Clock,
+  DollarSign,
+  Info,
+  PlayCircle,
+  X,
+} from "lucide-react";
 import { EnrollPanel } from "@/components/marketing/enroll-panel";
 import { Faq } from "@/components/marketing/faq";
 import { CourseTestimonials } from "@/components/marketing/testimonials";
@@ -61,6 +70,24 @@ function Title({
   );
 }
 
+function Cta({ label, light }: { label: string; light?: boolean }) {
+  return (
+    <Button
+      asChild
+      size="lg"
+      className={
+        light
+          ? "bg-[#f2a7c9] text-[#1b1026] hover:bg-[#f2a7c9]/90"
+          : "bg-[#1b1026] text-white hover:bg-[#1b1026]/90"
+      }
+    >
+      <Link href="#enroll">
+        {label} <ArrowRight aria-hidden />
+      </Link>
+    </Button>
+  );
+}
+
 export function WorkshopOfferPage({
   course,
   phases,
@@ -71,7 +98,10 @@ export function WorkshopOfferPage({
 }: Props) {
   const accent = course.accent_color;
   const titleOf = new Map(outline.map((o) => [o.day_number, o.title]));
-  const { comparison } = offer;
+  const { comparison, needs, timeline, money } = offer;
+  const off = percentOff(course.list_price_cents, course.price_cents);
+  const price = formatUsd(course.price_cents);
+  const ctaLabel = `Start now · ${price}`;
 
   return (
     <div className="pb-24 md:pb-0">
@@ -92,10 +122,10 @@ export function WorkshopOfferPage({
                 <span
                   key={line}
                   className={
-                    i === offer.headline.length - 1 ? "mt-1 block text-[#f2a7c9]" : "inline"
+                    i === offer.headline.length - 1 ? "mt-1 block text-[#f2a7c9]" : "block"
                   }
                 >
-                  {line}{" "}
+                  {line}
                 </span>
               ))}
             </h1>
@@ -135,6 +165,93 @@ export function WorkshopOfferPage({
                 {!course.has_guarantee && " · no refund guarantee on this workshop."}
               </span>
             </p>
+          </div>
+        </div>
+      </section>
+
+      {/* ------------------------------------------------------------ PRICE STRIP */}
+      {off > 0 && (
+        <section aria-label="Launch price" className="bg-[#f2a7c9] text-[#1b1026]">
+          <div className="container-page flex flex-col items-center justify-between gap-3 py-4 text-center sm:flex-row sm:text-left">
+            <p className="font-semibold">
+              🔥 Launch price: {off}% off — {price} instead of{" "}
+              <span className="line-through">{formatUsd(course.list_price_cents ?? 0)}</span>. One
+              payment, every lesson, yours forever.
+            </p>
+            <Link
+              href="#enroll"
+              className="inline-flex shrink-0 items-center gap-1.5 rounded-full bg-[#1b1026] px-4 py-2 text-sm font-semibold text-white"
+            >
+              Grab it now <ArrowRight className="size-4" aria-hidden />
+            </Link>
+          </div>
+        </section>
+      )}
+
+      {/* ------------------------------------------------------------ NEEDS */}
+      <section aria-labelledby="needs-title" className="container-page py-16 sm:py-24">
+        <Title
+          id="needs-title"
+          eyebrow="Zero skills required"
+          title="If you can copy and paste, you can do this."
+        />
+        <div className="mt-10 grid gap-4 md:grid-cols-2">
+          <div className="border-border bg-surface rounded-3xl border p-6 sm:p-8">
+            <p className="font-serif text-2xl font-semibold">All you need</p>
+            <ul className="mt-4 space-y-3 text-[17px]">
+              {needs.yes.map((t) => (
+                <li key={t} className="flex items-start gap-3">
+                  <Check className="text-success mt-1 size-5 shrink-0" aria-hidden />
+                  {t}
+                </li>
+              ))}
+            </ul>
+          </div>
+          <div className="rounded-3xl bg-[#1b1026] p-6 text-white sm:p-8">
+            <p className="font-serif text-2xl font-semibold">What you don&apos;t need</p>
+            <ul className="mt-4 space-y-3 text-[17px]">
+              {needs.no.map((t) => (
+                <li key={t} className="flex items-start gap-3">
+                  <X className="mt-1 size-5 shrink-0 text-[#f2a7c9]" aria-hidden />
+                  <span>
+                    <span className="sr-only">Not needed: </span>
+                    {t}
+                  </span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      {/* ------------------------------------------------------------ TIMELINE */}
+      <section aria-labelledby="timeline-title" className="bg-surface-muted">
+        <div className="container-page py-16 sm:py-24">
+          <Title
+            id="timeline-title"
+            eyebrow="2–3 hours"
+            title={timeline.title}
+            intro={timeline.intro}
+          />
+          <ol className="mt-10 grid gap-4 md:grid-cols-3">
+            {timeline.steps.map((s, i) => (
+              <li
+                key={s.when}
+                className="border-border bg-surface shadow-soft relative rounded-3xl border p-6"
+              >
+                <p className="inline-flex items-center gap-1.5 rounded-full bg-[#f8e1ec] px-3 py-1 text-sm font-semibold text-[#8f2659]">
+                  <Clock className="size-4" aria-hidden /> {s.when}
+                </p>
+                <p className="mt-4 font-serif text-2xl font-semibold">
+                  <span className="text-muted-foreground mr-2">{i + 1}.</span>
+                  {s.title}
+                </p>
+                <p className="text-muted-foreground mt-2 leading-relaxed">{s.body}</p>
+              </li>
+            ))}
+          </ol>
+          <div className="mt-10 text-center">
+            <Cta label={ctaLabel} />
           </div>
         </div>
       </section>
@@ -229,36 +346,73 @@ export function WorkshopOfferPage({
           ))}
         </ul>
         <p className="text-muted-foreground mt-4 text-sm">{comparison.footnote}</p>
+        <div className="mt-8 text-center">
+          <Cta label={ctaLabel} />
+        </div>
+      </section>
+
+      {/* ------------------------------------------------------------ MONEY */}
+      <section
+        aria-labelledby="money-title"
+        className="text-white"
+        style={{
+          background: `radial-gradient(900px 420px at 10% 0%, ${accent}55, transparent 65%), ${INK}`,
+        }}
+      >
+        <div className="container-page py-16 sm:py-24">
+          <Title
+            id="money-title"
+            light
+            eyebrow="Turn views into income"
+            title={money.title}
+            intro={money.intro}
+          />
+          <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            {money.points.map((m) => (
+              <div key={m.title} className="rounded-3xl border border-white/10 bg-white/[0.05] p-6">
+                <DollarSign className="size-6 text-[#f2a7c9]" aria-hidden />
+                <p className="mt-3 font-serif text-xl font-semibold">{m.title}</p>
+                <p className="mt-2 leading-relaxed text-white/75">{m.body}</p>
+              </div>
+            ))}
+          </div>
+          <p className="mt-6 max-w-3xl text-sm text-white/60">{money.disclaimer}</p>
+          <div className="mt-8">
+            <Cta label={ctaLabel} light />
+          </div>
+        </div>
       </section>
 
       {/* ------------------------------------------------------------ INSIDE */}
-      <section aria-labelledby="inside-title" className="text-white" style={{ background: INK }}>
+      <section aria-labelledby="inside-title">
         <div className="container-page py-16 sm:py-24">
           <Title
             id="inside-title"
-            light
             eyebrow="What's inside"
             title={`${course.days} lessons. All open the moment you join.`}
             intro="Each lesson has a short video, simple steps and copy-paste prompts for Windows, Mac and Linux."
           />
           <div className="mt-10 grid gap-4 lg:grid-cols-3">
             {phases.map((ph, idx) => (
-              <div key={ph.id} className="rounded-3xl border border-white/10 bg-white/[0.04] p-6">
-                <p className="text-xs font-semibold tracking-wider text-[#f2a7c9] uppercase">
+              <div
+                key={ph.id}
+                className="border-border bg-surface shadow-soft rounded-3xl border p-6"
+              >
+                <p className="text-xs font-semibold tracking-wider text-[#8f2659] uppercase">
                   Module {idx + 1}
                 </p>
                 <p className="mt-1 font-serif text-2xl font-semibold">{ph.name}</p>
                 {offer.outcomes[idx] && (
-                  <p className="mt-2 text-[15px] leading-relaxed text-white/70">
+                  <p className="text-muted-foreground mt-2 text-[15px] leading-relaxed">
                     {offer.outcomes[idx].body}
                   </p>
                 )}
-                <ol className="mt-4 space-y-2 border-t border-white/10 pt-4">
+                <ol className="border-border mt-4 space-y-2 border-t pt-4">
                   {Array.from({ length: ph.end_day - ph.start_day + 1 }, (_, i) => ph.start_day + i)
                     .filter((n) => titleOf.has(n))
                     .map((n) => (
-                      <li key={n} className="flex items-start gap-2.5 text-[15px] text-white/90">
-                        <PlayCircle className="mt-0.5 size-4 shrink-0 text-[#f2a7c9]" aria-hidden />
+                      <li key={n} className="flex items-start gap-2.5 text-[15px]">
+                        <PlayCircle className="mt-0.5 size-4 shrink-0 text-[#8f2659]" aria-hidden />
                         {titleOf.get(n)}
                       </li>
                     ))}
@@ -270,8 +424,8 @@ export function WorkshopOfferPage({
       </section>
 
       {/* ------------------------------------------------------------ PEEK */}
-      <section aria-labelledby="peek-title" className="container-page py-16 sm:py-24">
-        <div className="grid gap-10 lg:grid-cols-[0.8fr_1.2fr] lg:items-center">
+      <section aria-labelledby="peek-title" className="bg-surface-muted">
+        <div className="container-page grid gap-10 py-16 sm:py-24 lg:grid-cols-[0.8fr_1.2fr] lg:items-center">
           <Title
             id="peek-title"
             eyebrow="A real prompt from the course"
@@ -296,7 +450,7 @@ export function WorkshopOfferPage({
       <section
         id="costs"
         aria-labelledby="costs-title"
-        className="container-page scroll-mt-24 pb-16 sm:pb-24"
+        className="container-page scroll-mt-24 py-16 sm:py-24"
       >
         <Title id="costs-title" eyebrow="No surprises" title="Everything it costs" />
         <ul className="mt-8 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
@@ -351,18 +505,11 @@ export function WorkshopOfferPage({
             {offer.finalCta.title}
           </h2>
           <p className="mx-auto mt-4 max-w-xl text-lg text-white/80">{offer.finalCta.body}</p>
-          <Button
-            asChild
-            size="lg"
-            className="mt-8 bg-[#f2a7c9] text-[#1b1026] hover:bg-[#f2a7c9]/90"
-          >
-            <Link href="#enroll">
-              Get the workshop · {formatUsd(course.price_cents)} <ArrowRight aria-hidden />
-            </Link>
-          </Button>
+          <div className="mt-8">
+            <Cta label={`Start today · ${price}`} light />
+          </div>
           <p className="mt-4 text-sm text-white/65">
-            {percentOff(course.list_price_cents, course.price_cents) > 0 &&
-              `${percentOff(course.list_price_cents, course.price_cents)}% off the usual ${formatUsd(course.list_price_cents ?? 0)} · `}
+            {off > 0 && `${off}% off the usual ${formatUsd(course.list_price_cents ?? 0)} · `}
             One-time payment · Claude Pro required separately
             {course.has_guarantee ? "" : " · no refund guarantee"}
           </p>

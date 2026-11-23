@@ -228,8 +228,8 @@ Run migrations `20261122000001_self_paced_workshops.sql`,
 **Videos:** upload each explainer to YouTube as **Unlisted** (keep "Allow embedding" switched on
 so it can play on the lesson page), then paste the link into **Admin → Courses → (workshop) → Lessons**.
 The video id is stored in a table only admins can read and is sent only to enrolled learners when
-they press play, through a privacy-enhanced embed. This makes the link hard to find, not
-impossible — anyone who can watch a video can, with effort, copy it. Prompts to make the eight
+they press play, through a privacy-enhanced embed. The player is the normal YouTube player
+(settings, captions, full screen and "Watch on YouTube" all work), so learners can copy the link. Prompts to make the eight
 explainer videos with Claude Code are in `docs/explainer-video-prompts.md`.
 
 ---
