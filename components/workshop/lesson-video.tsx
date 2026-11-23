@@ -5,8 +5,8 @@ import { Loader2, Play } from "lucide-react";
 /**
  * Click-to-load lesson video. The embed address is fetched from the server
  * only after the click, for an enrolled learner, so it is not in the page
- * HTML. The player runs in a sandbox without popups, so YouTube's "watch on
- * YouTube" links can't open, and an overlay covers the title bar.
+ * HTML. The YouTube player itself is unrestricted: settings, captions,
+ * full screen and "watch on YouTube" all work.
  */
 export function LessonVideo({
   enrollmentId,
@@ -40,24 +40,16 @@ export function LessonVideo({
   }
 
   return (
-    <div
-      className="relative aspect-video w-full overflow-hidden rounded-2xl bg-[#172033]"
-      onContextMenu={(e) => e.preventDefault()}
-    >
+    <div className="relative aspect-video w-full overflow-hidden rounded-2xl bg-[#172033]">
       {src ? (
-        <>
-          <iframe
-            src={src}
-            title={`Lesson ${lesson} video: ${title}`}
-            className="absolute inset-0 h-full w-full"
-            allow="autoplay; encrypted-media; picture-in-picture; fullscreen"
-            allowFullScreen
-            referrerPolicy="strict-origin-when-cross-origin"
-            sandbox="allow-scripts allow-same-origin allow-presentation"
-          />
-          {/* Covers the title bar (title, share, watch-later links). */}
-          <div aria-hidden className="absolute inset-x-0 top-0 h-14" />
-        </>
+        <iframe
+          src={src}
+          title={`Lesson ${lesson} video: ${title}`}
+          className="absolute inset-0 h-full w-full"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share; fullscreen"
+          allowFullScreen
+          referrerPolicy="strict-origin-when-cross-origin"
+        />
       ) : (
         <button
           type="button"

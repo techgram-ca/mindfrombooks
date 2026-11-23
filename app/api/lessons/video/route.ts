@@ -53,9 +53,7 @@ export const GET = handle(async (request: Request) => {
 
   const params = new URLSearchParams({
     rel: "0",
-    modestbranding: "1",
     playsinline: "1",
-    iv_load_policy: "3",
     autoplay: "1",
   });
   return NextResponse.json(
