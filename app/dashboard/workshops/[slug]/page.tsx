@@ -31,6 +31,20 @@ export default async function WorkshopOverviewPage({
   const done = responded.size;
   const next = lessons.find((l) => !responded.has(l.number))?.number ?? null;
   const base = `/dashboard/workshops/${course.slug}`;
+  // Modules, plus any lessons no module covers (e.g. a bonus added later).
+  const inPhase = (n: number) => phases.some((p) => n >= p.start_day && n <= p.end_day);
+  const extra = lessons.filter((l) => !inPhase(l.number));
+  const groups = [
+    ...phases.map((ph, i) => ({
+      key: ph.id,
+      label: `Module ${i + 1}`,
+      name: ph.name,
+      lessons: lessons.filter((l) => l.number >= ph.start_day && l.number <= ph.end_day),
+    })),
+    ...(extra.length > 0
+      ? [{ key: "extra", label: "", name: phases.length ? "Bonus" : "Lessons", lessons: extra }]
+      : []),
+  ];
 
   return (
     <div className="space-y-7">
@@ -81,44 +95,44 @@ export default async function WorkshopOverviewPage({
         </CardBody>
       </Card>
 
-      {phases.map((ph, idx) => (
-        <section key={ph.id} aria-labelledby={`module-${idx}`}>
+      {groups.map((g, idx) => (
+        <section key={g.key} aria-labelledby={`module-${idx}`}>
           <h2 id={`module-${idx}`} className="text-xl font-semibold">
-            <span className="text-muted-foreground mr-2 text-sm font-semibold tracking-wide uppercase">
-              Module {idx + 1}
-            </span>
-            {ph.name}
+            {g.label && (
+              <span className="text-muted-foreground mr-2 text-sm font-semibold tracking-wide uppercase">
+                {g.label}
+              </span>
+            )}
+            {g.name}
           </h2>
           <ol className="border-border bg-surface rounded-card mt-3 divide-y overflow-hidden border">
-            {lessons
-              .filter((l) => l.number >= ph.start_day && l.number <= ph.end_day)
-              .map((l) => (
-                <li key={l.number}>
-                  <Link
-                    href={`${base}/${l.number}`}
-                    className="hover:bg-surface-muted/60 flex items-center gap-3 px-4 py-3.5"
-                  >
-                    {responded.has(l.number) ? (
-                      <CheckCircle2 className="text-success size-5 shrink-0" aria-label="Done" />
-                    ) : (
-                      <Circle
-                        className="text-muted-foreground size-5 shrink-0"
-                        aria-label="Not done yet"
-                      />
-                    )}
-                    <span className="text-muted-foreground w-16 shrink-0 text-sm">
-                      Lesson {l.number}
-                    </span>
-                    <span className="min-w-0 flex-1 font-medium">{l.title}</span>
-                    {l.hasVideo && (
-                      <PlayCircle
-                        className="text-muted-foreground size-4 shrink-0"
-                        aria-label="Has a video"
-                      />
-                    )}
-                  </Link>
-                </li>
-              ))}
+            {g.lessons.map((l) => (
+              <li key={l.number}>
+                <Link
+                  href={`${base}/${l.number}`}
+                  className="hover:bg-surface-muted/60 flex items-center gap-3 px-4 py-3.5"
+                >
+                  {responded.has(l.number) ? (
+                    <CheckCircle2 className="text-success size-5 shrink-0" aria-label="Done" />
+                  ) : (
+                    <Circle
+                      className="text-muted-foreground size-5 shrink-0"
+                      aria-label="Not done yet"
+                    />
+                  )}
+                  <span className="text-muted-foreground w-16 shrink-0 text-sm">
+                    Lesson {l.number}
+                  </span>
+                  <span className="min-w-0 flex-1 font-medium">{l.title}</span>
+                  {l.hasVideo && (
+                    <PlayCircle
+                      className="text-muted-foreground size-4 shrink-0"
+                      aria-label="Has a video"
+                    />
+                  )}
+                </Link>
+              </li>
+            ))}
           </ol>
         </section>
       ))}

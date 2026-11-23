@@ -63,3 +63,23 @@ describe("parseTaskImport", () => {
     expect(parseTaskImport("", 5).errors).toHaveLength(1);
   });
 });
+
+describe("workshop lesson import", () => {
+  it("keeps prompt, link and note blocks", () => {
+    const raw = JSON.stringify([
+      {
+        day_number: 9,
+        title: "Bonus",
+        resources: [{ kind: "prompt", label: "Prompt", content: "Make a Reel about [IDEA]" }],
+      },
+    ]);
+    const r = parseTaskImport(raw, 9);
+    expect(r.errors).toEqual([]);
+    expect(r.tasks[0].resources).toHaveLength(1);
+  });
+
+  it("leaves blocks alone when the import has none", () => {
+    const r = parseTaskImport(JSON.stringify([{ day_number: 1, title: "Day 1" }]), 9);
+    expect(r.tasks[0].resources).toBeUndefined();
+  });
+});
